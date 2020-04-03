@@ -1,0 +1,22 @@
+version: '2'
+services:
+
+  explorer:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file: .env
+    entrypoint: dockerize -wait tcp://explorer_db:5432 -timeout 120s
+    depends_on:
+      - explorer_db
+    command: /app/scripts/start.sh
+
+  explorer_db:
+    image: postgres:12
+    ports:
+      - '5433:5432'
+    env_file: .env
+
