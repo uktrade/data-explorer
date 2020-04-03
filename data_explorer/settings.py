@@ -93,20 +93,24 @@ if VCAP_SERVICES:
     VCAP_DATABASES = sort_database_config(VCAP_SERVICES['postgres'])
 
     DEFAULT_DATABASE_URL = VCAP_DATABASES[env('POSTGRES_DB')]
+    DATASETS_DATABASE_URL = VCAP_DATABASES[env('DATASETS_DB')]
 
 
     DATABASES = {
         'default': dj_database_url.parse(DEFAULT_DATABASE_URL),
+        'datasets': dj_database_url.parse(DATASETS_DATABASE_URL),
     }
 else:
+    DB_CONFIG = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('POSTGRES_DB'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST'),
+    }
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('POSTGRES_DB'),
-            'USER': env('POSTGRES_USER'),
-            'PASSWORD': env('POSTGRES_PASSWORD'),
-            'HOST': env('POSTGRES_HOST'),
-        },
+        'default': DB_CONFIG,
+        'datasets': DB_CONFIG
     }
 
 
@@ -161,6 +165,6 @@ STATIC_FOLDER = os.path.join(BASE_DIR, 'static')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-EXPLORER_CONNECTIONS = {'default db': 'default'}
-EXPLORER_DEFAULT_CONNECTION = 'default'
+EXPLORER_CONNECTIONS = {'default db': 'datasets'}
+EXPLORER_DEFAULT_CONNECTION = 'datasets'
 
