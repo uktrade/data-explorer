@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 import environ
 import dj_database_url
+import socket
 
 env = environ.Env()
 
@@ -32,6 +33,10 @@ DEBUG = True
 ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost').split(',')
 
 
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_COLLAPSED': True,
+}
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,10 +48,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'explorer',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -168,3 +175,12 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 EXPLORER_CONNECTIONS = {'default db': 'datasets'}
 EXPLORER_DEFAULT_CONNECTION = 'datasets'
 
+# Internal IPs required by the django debug tool bar
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+# If using docker and you would like to not use the tool bar
+# comment out adding the ip to the internal ips list
+ip = socket.gethostbyname(socket.gethostname())
+INTERNAL_IPS += [ip[:-1] + "1"]
