@@ -165,5 +165,5 @@ STATIC_FOLDER = os.path.join(BASE_DIR, 'static')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-EXPLORER_CONNECTIONS = {'default db': 'default'}
+EXPLORER_CONNECTIONS = {'default': 'default'}
 EXPLORER_DEFAULT_CONNECTION = 'default'
