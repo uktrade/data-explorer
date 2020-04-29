@@ -118,6 +118,7 @@ else:
         'USER': env('POSTGRES_USER'),
         'PASSWORD': env('POSTGRES_PASSWORD'),
         'HOST': env('POSTGRES_HOST'),
+        'PORT': env('POSTGRES_PORT'),
     }
     DATABASES = {
         'default': DB_CONFIG,
