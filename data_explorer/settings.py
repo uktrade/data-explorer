@@ -125,6 +125,8 @@ else:
         'datasets': DB_CONFIG
     }
 
+EXPLORER_CONNECTIONS = {'Default': 'default', 'Datasets': 'datasets'}
+EXPLORER_DEFAULT_CONNECTION = 'datasets'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -176,9 +178,6 @@ STATIC_ROOT = ASSETS_FOLDER
 STATIC_FOLDER = os.path.join(BASE_DIR, 'static')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-
-EXPLORER_CONNECTIONS = {'default db': 'datasets'}
-EXPLORER_DEFAULT_CONNECTION = 'datasets'
 
 # Internal IPs required by the django debug tool bar
 INTERNAL_IPS = [
