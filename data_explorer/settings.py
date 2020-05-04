@@ -15,6 +15,9 @@ import environ
 import dj_database_url
 import socket
 
+from dotenv import load_dotenv
+load_dotenv()
+
 env = environ.Env()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -48,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'explorer',
+    'dynamic_models',
     'debug_toolbar',
 ]
 
@@ -114,12 +118,15 @@ else:
         'USER': env('POSTGRES_USER'),
         'PASSWORD': env('POSTGRES_PASSWORD'),
         'HOST': env('POSTGRES_HOST'),
+        'PORT': env('POSTGRES_PORT'),
     }
     DATABASES = {
         'default': DB_CONFIG,
         'datasets': DB_CONFIG
     }
 
+EXPLORER_CONNECTIONS = {'Default': 'default', 'Datasets': 'datasets'}
+EXPLORER_DEFAULT_CONNECTION = 'datasets'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -171,9 +178,6 @@ STATIC_ROOT = ASSETS_FOLDER
 STATIC_FOLDER = os.path.join(BASE_DIR, 'static')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-
-EXPLORER_CONNECTIONS = {'default db': 'datasets'}
-EXPLORER_DEFAULT_CONNECTION = 'datasets'
 
 # Internal IPs required by the django debug tool bar
 INTERNAL_IPS = [
