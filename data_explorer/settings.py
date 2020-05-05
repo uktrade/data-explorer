@@ -9,11 +9,9 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
 import os
 import environ
 import dj_database_url
-import socket
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -34,6 +32,7 @@ SECRET_KEY = '%=g9vzldwcd9rvg5pefh%^60#wn+mecd0v0@d^9^)(f_1c7ae*'
 DEBUG = True
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost').split(',')
+ALLOWED_HOSTS += ['*']
 
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -60,6 +59,10 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+]
+if env.bool('AUTO_LOGIN', False):
+    MIDDLEWARE += ['data_explorer.middleware.AutoLoginMiddleware']
+MIDDLEWARE += [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -112,8 +115,12 @@ if VCAP_SERVICES:
         'datasets': dj_database_url.parse(DATASETS_DATABASE_URL),
     }
 else:
+    DEFAULT_SCHEMA = env.str('APP_SCHEMA', 'public')
     DB_CONFIG = {
         'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {
+                'options': f'-c search_path={DEFAULT_SCHEMA}'
+        },
         'NAME': env('POSTGRES_DB'),
         'USER': env('POSTGRES_USER'),
         'PASSWORD': env('POSTGRES_PASSWORD'),
@@ -184,7 +191,8 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-# If using docker and you would like to not use the tool bar
-# comment out adding the ip to the internal ips list
-ip = socket.gethostbyname(socket.gethostname())
-INTERNAL_IPS += [ip[:-1] + "1"]
+# If using docker and you would like to use the tool bar
+# remove comments to add the ip to the internal ips list
+# import socket
+# ip = socket.gethostbyname(socket.gethostname())
+# INTERNAL_IPS += [ip[:-1] + "1"]
