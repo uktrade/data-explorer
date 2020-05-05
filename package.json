@@ -1,0 +1,68 @@
+{
+  "name": "data-explorer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "clean-bundles": "rimraf _static/js/bundles data_explorer/static/js/bundles",
+    "start": "webpack --config webpack.local.config.js  --watch --progress --colors",
+    "prestart": "npm run clean-bundles",
+    "build": "webpack --config webpack.prod.config.js --progress --colors",
+    "prebuild": "npm run clean-bundles"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uktrade/data-explorer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uktrade/data-explorer/issues"
+  },
+  "homepage": "https://github.com/uktrade/data-explorer#readme",
+  "dependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel": "^6.23.0",
+    "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.6",
+    "copy-webpack-plugin": "^5.1.1",
+    "css-loader": "^3.2.0",
+    "eslint": "^5.16.0",
+    "glob": "^7.1.4",
+    "govuk-frontend": "^2.13.0",
+    "nunjucks": "^3.2.0",
+    "rimraf": "^3.0.0",
+    "rxjs": "^6.5.3",
+    "vue": "^2.6.10",
+    "vue-loader": "^15.7.1",
+    "vue-rx": "^6.2.0",
+    "vue-style-loader": "^4.1.2",
+    "vue-template-compiler": "^2.6.10",
+    "webpack": "^4.39.3",
+    "webpack-bundle-tracker": "^0.4.2-beta",
+    "webpack-cli": "^3.3.8"
+  },
+  "devDependencies": {},
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}
