@@ -2,6 +2,7 @@
 
 source ./scripts/functions.sh
 
+run "./scripts/compile_assets.sh"
 run "python manage.py migrate --noinput"
 
 if [[ -z "${DEVELOPMENT_SERVER}" ]]; then
