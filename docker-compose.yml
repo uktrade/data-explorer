@@ -1,14 +1,17 @@
-version: '2'
+version: '3.4'
 services:
 
   explorer:
     build:
       context: .
+      target: dev
     ports:
       - "8000:8000"
     volumes:
       - .:/app
     env_file: .env
+    environment:
+      - COMPILE_ASSETS=1
     entrypoint: dockerize -wait tcp://explorer_db:5432 -timeout 120s
     depends_on:
       - explorer_db

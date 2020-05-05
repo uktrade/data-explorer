@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7 AS dev
 
 RUN apt-get update -y
 
@@ -13,6 +13,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN scripts/compile_assets.sh
+FROM dev AS integrated
 
+RUN scripts/compile_assets.sh
 CMD /app/scripts/start.sh

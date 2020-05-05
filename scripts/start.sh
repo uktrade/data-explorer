@@ -27,11 +27,11 @@ then
     fi
 fi
 
-run "./scripts/start_cf.sh"
 
-if [[ -z "${DEVELOPMENT_SERVER}" ]];
+if [ -z "${COMPILE_ASSETS}" ];
 then
-    :
+  :
 else
-    run "sleep infinity"
+  run "./scripts/compile_assets.sh"
 fi
+run "./scripts/start_server.sh"
