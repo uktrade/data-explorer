@@ -2,9 +2,10 @@
 
 source ./scripts/functions.sh
 
-if [[ -z "${DEVELOPMENT_SERVER}" ]]; then
+if [[ -z "${DEVELOPMENT_SERVER}" ]]
+then
     export PORT=8000
-
+fi
 if [ -z "${POSTGRES_DB}" ] && [ -z "${POSTGRES_PORT}" ] \
     && [ -z "${POSTGRES_HOST}" ] && [ -z "${POSTGRES_PASSWORD}" ] \
     && [ -z "${POSTGRES_USER}" ]
