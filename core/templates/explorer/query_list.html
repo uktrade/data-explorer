@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+
+{% load i18n %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+          <p class="govuk-heading-m govuk-!-margin-bottom-2">{% trans 'Your Most Recently Run' %}</p>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+          <p class="govuk-heading-m govuk-!-margin-bottom-2">{% trans 'All Queries' %}</p>
+      </div>
+  </div>
+{% endblock content %}

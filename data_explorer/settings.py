@@ -49,9 +49,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'core',
     'explorer',
     'dynamic_models',
     'debug_toolbar',
+    'sass_processor',
+    'webpack_loader',
 ]
 
 MIDDLEWARE = [
@@ -170,12 +173,13 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-
 STATIC_URL = '/static/'
+
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'sass_processor.finders.CssFinder',
 ]
 
 ASSETS_FOLDER = os.path.join(BASE_DIR, '_static')
@@ -184,7 +188,29 @@ STATIC_ROOT = ASSETS_FOLDER
 
 STATIC_FOLDER = os.path.join(BASE_DIR, 'static')
 
+STATICFILES_DIRS = [
+    ('data_explorer', STATIC_FOLDER),
+]
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'data_explorer/js/bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
+
+SASS_PROCESSOR_INCLUDE_DIRS = [
+    STATIC_FOLDER,
+]
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+SASS_PROCESSOR_INCLUDE_FILE_PATTERN = r'^.+\.scss$'
+
+SASS_OUTPUT_STYLE = 'compressed'
+
+SASS_PROCESSOR_ENABLED = False
+SASS_PROCESSOR_AUTO_INCLUDE = False
 
 # Internal IPs required by the django debug tool bar
 INTERNAL_IPS = [
