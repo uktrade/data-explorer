@@ -112,7 +112,6 @@ if VCAP_SERVICES:
     DEFAULT_DATABASE_URL = VCAP_DATABASES[env('POSTGRES_DB')]
     DATASETS_DATABASE_URL = VCAP_DATABASES[env('DATASETS_DB')]
 
-
     DATABASES = {
         'default': dj_database_url.parse(DEFAULT_DATABASE_URL),
         'datasets': dj_database_url.parse(DATASETS_DATABASE_URL),
@@ -220,10 +219,9 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-# If using docker and you would like to use the tool bar
-# remove comments to add the ip to the internal ips list
+ENABLE_DEBUG_TOOLBAR = env.bool('ENABLE_DEBUG_TOOLBAR', default=DEBUG)
 
-if DEBUG:
+if DEBUG and ENABLE_DEBUG_TOOLBAR:
     import socket
     ip = socket.gethostbyname(socket.gethostname())
     INTERNAL_IPS += [ip[:-1] + "1"]
