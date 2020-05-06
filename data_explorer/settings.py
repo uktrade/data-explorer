@@ -29,7 +29,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '%=g9vzldwcd9rvg5pefh%^60#wn+mecd0v0@d^9^)(f_1c7ae*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost').split(',')
 ALLOWED_HOSTS += ['*']
@@ -111,7 +111,6 @@ if VCAP_SERVICES:
 
     DEFAULT_DATABASE_URL = VCAP_DATABASES[env('POSTGRES_DB')]
     DATASETS_DATABASE_URL = VCAP_DATABASES[env('DATASETS_DB')]
-
 
     DATABASES = {
         'default': dj_database_url.parse(DEFAULT_DATABASE_URL),
@@ -203,22 +202,24 @@ SASS_PROCESSOR_INCLUDE_DIRS = [
     STATIC_FOLDER,
 ]
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+if DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+else:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SASS_PROCESSOR_INCLUDE_FILE_PATTERN = r'^.+\.scss$'
 
 SASS_OUTPUT_STYLE = 'compressed'
 
-SASS_PROCESSOR_ENABLED = False
-SASS_PROCESSOR_AUTO_INCLUDE = False
+SASS_PROCESSOR_ENABLED = DEBUG
+SASS_PROCESSOR_AUTO_INCLUDE = DEBUG
 
-# Internal IPs required by the django debug tool bar
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
+ENABLE_DEBUG_TOOLBAR = env.bool('ENABLE_DEBUG_TOOLBAR', default=DEBUG)
 
-# If using docker and you would like to use the tool bar
-# remove comments to add the ip to the internal ips list
-# import socket
-# ip = socket.gethostbyname(socket.gethostname())
-# INTERNAL_IPS += [ip[:-1] + "1"]
+if DEBUG and ENABLE_DEBUG_TOOLBAR:
+    import socket
+    ip = socket.gethostbyname(socket.gethostname())
+    INTERNAL_IPS = [
+        '127.0.0.1',
+    ]
+    INTERNAL_IPS += [ip[:-1] + "1"]
