@@ -22,13 +22,13 @@
 	{% for object in recent_queries %}
 	<tr class="govuk-table__row">
 	  <td class="govuk-table__cell">
-	    <a href="{% url 'query_detail' object.query_id %}">
+	    <a href="{% url "query_detail" object.query_id %}">
 	      {{ object.query.title }}
 	    </a>
 	  </td>
 	  <td class="govuk-table__cell">{{ object.run_at|date:"SHORT_DATETIME_FORMAT" }}</td>
 	  <td class="govuk-table__cell">
-	    <a href="{% url 'download_query' object.query_id %}">
+	    <a href="{% url "download_query" object.query_id %}">
 	      Download
 	    </a>
 	  </td>
