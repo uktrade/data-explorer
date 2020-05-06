@@ -79,7 +79,7 @@
           <nav>
             <ul id="navigation" class="govuk-header__navigation" aria-label="Top Level Navigation">
               <li class="govuk-header__navigation-item{% if request.get_full_path == '/' %} govuk-header__navigation-item--active{% endif %}">
-                <a class="govuk-header__link" href="">
+                <a class="govuk-header__link" href="{% url 'explorer_index' %}">
                   Home
                 </a>
               </li>
