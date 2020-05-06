@@ -32,7 +32,20 @@ SECRET_KEY = '%=g9vzldwcd9rvg5pefh%^60#wn+mecd0v0@d^9^)(f_1c7ae*'
 DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost').split(',')
-ALLOWED_HOSTS += ['*']
+
+DEFAULT_SCHEMA = env.str('APP_SCHEMA', 'public')
+
+
+def get_allowed_host_from_schema():
+    if not DEFAULT_SCHEMA.startswith('_user_'):
+        return
+    user_id = DEFAULT_SCHEMA.replace('_user_', '')
+    return f'https://dataexplorer-{user_id}.data.trade.gov.uk'
+
+
+HOST_FROM_SCHEMA = get_allowed_host_from_schema()
+if HOST_FROM_SCHEMA:
+    ALLOWED_HOSTS += [HOST_FROM_SCHEMA]
 
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -117,7 +130,6 @@ if VCAP_SERVICES:
         'datasets': dj_database_url.parse(DATASETS_DATABASE_URL),
     }
 else:
-    DEFAULT_SCHEMA = env.str('APP_SCHEMA', 'public')
     DB_CONFIG = {
         'ENGINE': 'django.db.backends.postgresql',
         'OPTIONS': {
