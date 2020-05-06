@@ -214,14 +214,12 @@ SASS_OUTPUT_STYLE = 'compressed'
 SASS_PROCESSOR_ENABLED = DEBUG
 SASS_PROCESSOR_AUTO_INCLUDE = DEBUG
 
-# Internal IPs required by the django debug tool bar
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
-
 ENABLE_DEBUG_TOOLBAR = env.bool('ENABLE_DEBUG_TOOLBAR', default=DEBUG)
 
 if DEBUG and ENABLE_DEBUG_TOOLBAR:
     import socket
     ip = socket.gethostbyname(socket.gethostname())
+    INTERNAL_IPS = [
+        '127.0.0.1',
+    ]
     INTERNAL_IPS += [ip[:-1] + "1"]
