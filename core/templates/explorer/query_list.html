@@ -77,11 +77,6 @@
             by {{ object.created_by_user }}
             {% endif %}
           </td>
-          {% if tasks_enabled %}
-          <td>
-            <a class="email-csv" data-id="{{ object.id }}" href="{% url "email_csv_query" object.id %}"><i class="glyphicon glyphicon-envelope"></i></a>
-          </td>
-          {% endif %}
           {% if can_change %}
           <td>
             <a href="{% url "explorer_playground" %}?query_id={{ object.id }}">Play</a>
