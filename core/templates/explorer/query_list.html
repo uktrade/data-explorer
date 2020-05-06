@@ -3,12 +3,80 @@
 {% load i18n %}
 
 {% block content %}
-  <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-          <p class="govuk-heading-m govuk-!-margin-bottom-2">{% trans 'Your Most Recently Run' %}</p>
-      </div>
-      <div class="govuk-grid-column-two-thirds">
-          <p class="govuk-heading-m govuk-!-margin-bottom-2">{% trans 'All Queries' %}</p>
-      </div>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {% if recent_queries|length > 0 %}
+    <p class="govuk-heading-m govuk-!-margin-bottom-2">
+      {% trans 'Your '%} {{ recent_queries|length }}  {% trans 'Most Recently Run' %}
+    </p>
+
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+	<tr class="govuk-table__row">
+	  <th scope="col" class="govuk-table__header">Query</th>
+	  <th scope="col" class="govuk-table__header">Last Run</th>
+	  <th scope="col" class="govuk-table__header">CSV</th>
+	</tr>
+      </thead>
+      <tbody class="govuk-table__body">
+	{% for object in recent_queries %}
+	<tr class="govuk-table__row">
+	  <td class="govuk-table__cell">
+	    <a href="{% url 'query_detail' object.query_id %}">
+	      {{ object.query.title }}
+	    </a>
+	  </td>
+	  <td class="govuk-table__cell">{{ object.run_at|date:"SHORT_DATETIME_FORMAT" }}</td>
+	  <td class="govuk-table__cell">
+	    <a href="{% url 'download_query' object.query_id %}">
+	      Download
+	    </a>
+	  </td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+    
+    {% endif %}
   </div>
+  
+  <div class="govuk-grid-column-two-thirds">
+    <p class="govuk-heading-m govuk-!-margin-bottom-2">{% trans 'All Queries' %}</p>
+
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+	<tr class="govuk-table__row">
+	  <th scope="col" class="govuk-table__header">Query</th>
+	  <th scope="col" class="govuk-table__header">Download</th>
+	  <th scope="col" class="govuk-table__header">Created</th>
+	  <th scope="col" class="govuk-table__header">Run Count</th>
+	  <th scope="col" class="govuk-table__header">Delete</th>
+	</tr>
+      </thead>
+      <tbody class="govuk-table__body">
+	{% for object in object_list %}
+	<tr class="govuk-table__row">
+	  <td class="govuk-table__cell">
+	    <a href="{% url 'query_detail' object.id %} ">
+	      {{ object.title }}
+	    </a>
+	  </td>
+	  <td class="govuk-table__cell">
+	    <a href="{% url 'download_query' object.id %} ">
+	      Download
+	    </a>
+	  </td>
+	  <td class="govuk-table__cell">{{ object.created_at|date:"SHORT_DATETIME_FORMAT" }}</td>
+	  <td class="govuk-table__cell">{{ object.run_count }}</td>
+	  <td class="govuk-table__cell"><a href="{% url "query_delete" object.id %}">Delete</a></td>
+	  
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+    
+  </div>
+  
+</div>
+
 {% endblock content %}
