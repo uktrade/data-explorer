@@ -2,8 +2,6 @@
 
 source ./scripts/functions.sh
 
+run "./scripts/compile_assets.sh"
 run "python manage.py migrate --noinput"
-
-if [[ -z "${DEVELOPMENT_SERVER}" ]]; then
-    run "waitress-serve --port=$PORT data_explorer.wsgi:application"
-fi
+run "waitress-serve --port=$PORT data_explorer.wsgi:application"
