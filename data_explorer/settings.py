@@ -29,7 +29,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '%=g9vzldwcd9rvg5pefh%^60#wn+mecd0v0@d^9^)(f_1c7ae*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost').split(',')
 ALLOWED_HOSTS += ['*']
@@ -203,14 +203,17 @@ SASS_PROCESSOR_INCLUDE_DIRS = [
     STATIC_FOLDER,
 ]
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+if DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+else:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SASS_PROCESSOR_INCLUDE_FILE_PATTERN = r'^.+\.scss$'
 
 SASS_OUTPUT_STYLE = 'compressed'
 
-SASS_PROCESSOR_ENABLED = False
-SASS_PROCESSOR_AUTO_INCLUDE = False
+SASS_PROCESSOR_ENABLED = DEBUG
+SASS_PROCESSOR_AUTO_INCLUDE = DEBUG
 
 # Internal IPs required by the django debug tool bar
 INTERNAL_IPS = [
@@ -219,6 +222,8 @@ INTERNAL_IPS = [
 
 # If using docker and you would like to use the tool bar
 # remove comments to add the ip to the internal ips list
-# import socket
-# ip = socket.gethostbyname(socket.gethostname())
-# INTERNAL_IPS += [ip[:-1] + "1"]
+
+if DEBUG:
+    import socket
+    ip = socket.gethostbyname(socket.gethostname())
+    INTERNAL_IPS += [ip[:-1] + "1"]
