@@ -26,7 +26,7 @@ module.exports = {
     new BundleTracker({filename: './webpack-stats.json'}),
     new VueLoaderPlugin(),
     new CopyPlugin([
-      { from: path.resolve(__dirname, './node_modules/govuk-frontend/all.js'), to: path.resolve(__dirname, './static/js/') },
+      { from: path.resolve(__dirname, './node_modules/govuk-frontend/govuk/all.js'), to: path.resolve(__dirname, './static/js/') },
     ]),
   ],
   resolve: {
