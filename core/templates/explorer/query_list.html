@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
+  <div class="govuk-width-container">
     {% if recent_queries|length > 0 %}
     <p class="govuk-heading-m govuk-!-margin-bottom-2">
       {% trans 'Your '%} {{ recent_queries|length }}  {% trans 'Most Recently Run' %}
@@ -40,7 +40,7 @@
     {% endif %}
   </div>
   
-  <div class="govuk-grid-column-two-thirds">
+  <div class="govuk-width-container">
     <p class="govuk-heading-m govuk-!-margin-bottom-2">{% trans 'All Queries' %}</p>
 
     <table class="govuk-table">
