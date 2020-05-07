@@ -148,25 +148,31 @@ if VCAP_SERVICES:
         'datasets': dj_database_url.parse(DATASETS_DATABASE_URL),
     }
 else:
+    POSTGRES_DB = env.str('POSTGRES_DB')
+    POSTGRES_USER = env.str('POSTGRES_USER')
+    POSTGRES_PASSWORD = env.str('POSTGRES_PASSWORD')
+    POSTGRES_HOST = env.str('POSTGRES_HOST')
+    POSTGRES_PORT = env.str('POSTGRES_PORT')
+
     DB_CONFIG = {
         'ENGINE': 'django.db.backends.postgresql',
         'OPTIONS': {
                 'options': f'-c search_path={DEFAULT_SCHEMA}'
         },
-        'NAME': env('POSTGRES_DB'),
-        'USER': env('POSTGRES_USER'),
-        'PASSWORD': env('POSTGRES_PASSWORD'),
-        'HOST': env('POSTGRES_HOST'),
-        'PORT': env('POSTGRES_PORT'),
+        'NAME': POSTGRES_DB,
+        'USER': POSTGRES_USER,
+        'PASSWORD': POSTGRES_PASSWORD,
+        'HOST': POSTGRES_HOST,
+        'PORT': POSTGRES_PORT,
     }
 
     DATASETS_DB_CONFIG = {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('POSTGRES_DB'),
-        'USER': env('POSTGRES_USER'),
-        'PASSWORD': env('POSTGRES_PASSWORD'),
-        'HOST': 'host.docker.internal',
-        'PORT': '5435',
+        'NAME': env.str('DATASETS_POSTGRES_DB', POSTGRES_DB),
+        'USER': env.str('DATASETS_POSTGRES_USER', POSTGRES_USER),
+        'PASSWORD': env.str('DATASETS_POSTGRES_PASSWORD', POSTGRES_PASSWORD),
+        'HOST': env.str('DATASETS_POSTGRES_HOST', POSTGRES_HOST),
+        'PORT': env.str('DATASETS_POSTGRES_PORT', POSTGRES_PORT),
     }
 
     DATABASES = {
