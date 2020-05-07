@@ -3,6 +3,8 @@ from django.contrib.auth import get_backends
 from django.contrib.auth import login
 from django.utils.deprecation import MiddlewareMixin
 
+USERNAME = 'user'
+
 
 class AutoLoginMiddleware(MiddlewareMixin):
     """
@@ -14,9 +16,9 @@ class AutoLoginMiddleware(MiddlewareMixin):
         if hasattr(request, 'user'):
             return
 
-        User.objects.filter(username='admin').exists() or \
-        User.objects.create_superuser('admin')
-        user = User.objects.filter(username='admin')
+        User.objects.filter(username=USERNAME).exists() or \
+        User.objects.create_user(USERNAME)
+        user = User.objects.filter(username=USERNAME)
         backend = get_backends()[0]
         user = user[0]
         user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
