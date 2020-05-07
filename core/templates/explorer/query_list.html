@@ -1,13 +1,12 @@
 {% extends 'core/base.html' %}
 
-{% load i18n %}
 
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-width-container">
     {% if recent_queries|length > 0 %}
     <p class="govuk-heading-m govuk-!-margin-bottom-2">
-      {% trans 'Your '%} {{ recent_queries|length }}  {% trans 'Most Recently Run' %}
+      Your&nbsp;{{ recent_queries|length }}&nbsp;Most Recently Run
     </p>
 
     <table class="govuk-table">
@@ -41,7 +40,7 @@
   </div>
   
   <div class="govuk-width-container">
-    <p class="govuk-heading-m govuk-!-margin-bottom-2">{% trans 'All Queries' %}</p>
+    <p class="govuk-heading-m govuk-!-margin-bottom-2">All Queries</p>
 
     <table class="govuk-table">
       <thead class="govuk-table__head">
