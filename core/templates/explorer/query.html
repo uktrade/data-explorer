@@ -4,12 +4,12 @@
 
 {% block sql_explorer_navlinks %}
     {% if can_change %}
-      <li{% if not query %} class="active" {% endif %}><a href="{% url "query_create" %}">New Query</a></li>
-      <li><a href="{% url "explorer_playground" %}">Playground</a></li>
+      <li{% if not query %} class="active" {% endif %}><a href="{% url 'query_create' %}">New Query</a></li>
+      <li><a href="{% url 'explorer_playground' %}">Playground</a></li>
     {% endif %}
     {% if query %}<li class="active"><a href="">Query Detail</a></li>{% endif %}
-    <li><a href="{% url "explorer_logs" %}">Logs</a></li>
-    <li><a href="{% url "connection_browser_list" %}">Table browser</a></li>
+    <li><a href="{% url 'explorer_logs' %}">Logs</a></li>
+    <li><a href="{% url 'connection_browser_list' %}">Table browser</a></li>
 {% endblock %}
 
 {% block content %}
@@ -22,7 +22,7 @@
                 </h1>
             </legend>
             {% if query %}
-                  <a href="{% url "explorer_logs" %}?query_id={{ query.id }}"><h2 class="small">History</h2></a>
+                  <a href="{% url 'explorer_logs' %}?query_id={{ query.id }}"><h2 class="small">History</h2></a>
             {% endif %}
 
             {% if message %}
@@ -36,9 +36,9 @@
             {% endif %}
 
             {% if query %}
-                <form action="{% url "query_detail" query.id %}" method="post" id="editor">{% csrf_token %}
+                <form action="{% url 'query_detail' query.id %}" method="post" id="editor">{% csrf_token %}
             {% else %}
-                <form action="{% url "query_create" %}" method="post" id="editor">{% csrf_token %}
+                <form action="{% url 'query_create' %}" method="post" id="editor">{% csrf_token %}
             {% endif %}
 
             {% if error %}
