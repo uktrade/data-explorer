@@ -13,6 +13,8 @@ import os
 import environ
 import dj_database_url
 
+from django.urls import reverse_lazy
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -68,7 +70,10 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'sass_processor',
     'webpack_loader',
+    'authbroker_client',
 ]
+
+AUTO_LOGIN = env.bool('AUTO_LOGIN', False)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -76,7 +81,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 ]
-if env.bool('AUTO_LOGIN', False):
+if AUTO_LOGIN:
     MIDDLEWARE += ['data_explorer.middleware.AutoLoginMiddleware']
 MIDDLEWARE += [
     'django.middleware.common.CommonMiddleware',
@@ -85,6 +90,19 @@ MIDDLEWARE += [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+if not AUTO_LOGIN:
+    MIDDLEWARE += ['authbroker_client.middleware.ProtectAllViewsMiddleware']
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'authbroker_client.backends.AuthbrokerBackend',
+]
+
+LOGIN_URL = reverse_lazy('authbroker:login')
+
+LOGIN_REDIRECT_URL = reverse_lazy('explorer_index')
+
 
 ROOT_URLCONF = 'data_explorer.urls'
 
@@ -141,9 +159,19 @@ else:
         'HOST': env('POSTGRES_HOST'),
         'PORT': env('POSTGRES_PORT'),
     }
+
+    DATASETS_DB_CONFIG = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('POSTGRES_DB'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': 'host.docker.internal',
+        'PORT': '5435',
+    }
+
     DATABASES = {
         'default': DB_CONFIG,
-        'datasets': DB_CONFIG
+        'datasets': DATASETS_DB_CONFIG
     }
 
 EXPLORER_CONNECTIONS = {'Default': 'default', 'Datasets': 'datasets'}
@@ -235,3 +263,17 @@ if DEBUG and ENABLE_DEBUG_TOOLBAR:
         '127.0.0.1',
     ]
     INTERNAL_IPS += [ip[:-1] + "1"]
+
+
+# authbroker config
+AUTHBROKER_URL = env.str('AUTHBROKER_URL', '')
+AUTHBROKER_CLIENT_ID = env.str('AUTHBROKER_CLIENT_ID', '')
+AUTHBROKER_CLIENT_SECRET = env.str('AUTHBROKER_CLIENT_SECRET', '')
+
+
+def check_permissions(user):
+    return user.is_authenticated
+
+
+EXPLORER_PERMISSION_VIEW = check_permissions
+EXPLORER_PERMISSION_CHANGE = check_permissions
