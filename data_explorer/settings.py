@@ -40,7 +40,7 @@ def get_allowed_host_from_schema():
     if not DEFAULT_SCHEMA.startswith('_user_'):
         return
     user_id = DEFAULT_SCHEMA.replace('_user_', '')
-    return f'https://dataexplorer-{user_id}.data.trade.gov.uk'
+    return f'dataexplorer-{user_id}.data.trade.gov.uk'
 
 
 HOST_FROM_SCHEMA = get_allowed_host_from_schema()
