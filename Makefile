@@ -4,7 +4,7 @@ CHECK ?= --check
 
 .PHONY: run_tests
 run_tests:
-	DEBUG=False pytest -v -p no:sugar ${TEST}
+	DEBUG=False pytest -v ${TEST}
 
 .PHONY: run_tests_local
 run_tests_local:
