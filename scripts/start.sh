@@ -6,6 +6,7 @@ if [[ -z "${DEVELOPMENT_SERVER}" ]]
 then
     export PORT=8000
 fi
+
 if [ -z "${POSTGRES_DB}" ] && [ -z "${POSTGRES_PORT}" ] \
     && [ -z "${POSTGRES_HOST}" ] && [ -z "${POSTGRES_PASSWORD}" ] \
     && [ -z "${POSTGRES_USER}" ]
@@ -27,11 +28,12 @@ then
     fi
 fi
 
-
 if [ -z "${COMPILE_ASSETS}" ];
 then
-  :
+    :
 else
-  run "./scripts/compile_assets.sh"
+    run "./scripts/compile_assets.sh"
 fi
+run "./scripts/compile_sass.sh"
+
 run "./scripts/start_server.sh"
