@@ -66,36 +66,32 @@
             document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled')
         </script>
         <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
-        {% url 'explorer_index' as index_url %}
-        {% url 'query_create' as new_query_url %}
-        {% url 'explorer_playground' as playground_url %}
-        {% url 'explorer_logs' as logs_url %}
-        {% url 'connection_browser_list' as table_browser_url %}
+        {% get_active_menu as active_menu %}
 
         <header class="govuk-header " role="banner" data-module="header">
             <div class="govuk-header__container govuk-width-container">
                 <div class="govuk-header__logotype">
-                    <a href="" class="govuk-header__link govuk-header__link--service-name" target="_blank">Data Explorer</a>
+                    <a href="" class="govuk-header__link govuk-header__link--service-name">Data Explorer</a>
                 </div>
                 <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>
                 <nav>
                     <ul id="navigation" class="govuk-header__navigation" aria-label="Top Level Navigation">
-                        <li class="govuk-header__navigation-item{% if request.get_full_path == index_url %} govuk-header__navigation-item--active{% endif %}">
-                            <a class="govuk-header__link" href="{{ index_url }}">Home</a>
+                        <li class="govuk-header__navigation-item{% if active_menu == 'home' %} govuk-header__navigation-item--active{% endif %}">
+                            <a class="govuk-header__link" href="{% url 'explorer_index' %}">Home</a>
                         </li>
-                        <li class="govuk-header__navigation-item{% if request.get_full_path == new_query_url %} govuk-header__navigation-item--active{% endif %}">
-                            <a class="govuk-header__link" href="{{ new_query_url }}">New Query</a>
+                        <li class="govuk-header__navigation-item{% if active_menu == 'new_query' %} govuk-header__navigation-item--active{% endif %}">
+                            <a class="govuk-header__link" href="{% url 'query_create' %}">New Query</a>
                         </li>
-                        <li class="govuk-header__navigation-item{% if request.get_full_path == playground_url %} govuk-header__navigation-item--active{% endif %}">
-                            <a class="govuk-header__link" href="{{ playground_url }}">Playground</a>
+                        <li class="govuk-header__navigation-item{% if active_menu == 'playground' %} govuk-header__navigation-item--active{% endif %}">
+                            <a class="govuk-header__link" href="{% url 'explorer_playground' %}">Playground</a>
                         </li>
-                        <li class="govuk-header__navigation-item{% if request.get_full_path == logs_url %} govuk-header__navigation-item--active{% endif %}">
-                            <a class="govuk-header__link" href="{{ logs_url }}">Logs</a>
+                        <li class="govuk-header__navigation-item{% if active_menu == 'logs' %} govuk-header__navigation-item--active{% endif %}">
+                            <a class="govuk-header__link" href="{% url 'explorer_logs' %}">Logs</a>
                         </li>
                         {% is_table_browser_enabled as table_browser %}
                         {% if table_browser %}
-                            <li class="govuk-header__navigation-item{% if request.get_full_path == table_browser_url %} govuk-header__navigation-item--active{% endif %}">
-                                <a class="govuk-header__link" href="{{ table_browser_url }}">Table browser</a>
+                            <li class="govuk-header__navigation-item{% if active_menu == 'table_browser' %} govuk-header__navigation-item--active{% endif %}">
+                                <a class="govuk-header__link" href="{% url 'connection_browser_list' %}">Table browser</a>
                             </li>
                         {% endif %}
                         {% block additional_nav %}{% endblock %}
