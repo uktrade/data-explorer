@@ -80,8 +80,8 @@
                         Connection
                     </label>
                     <select class="govuk-select" id="id_connection" name="connection">
-                        {% for x, y in form.connections %}
-                            <option value="{{ x }}"{% if form.fields.connection.value == x %} selected{% endif %}>{{ y }}</option>
+                        {% for value, label in form.connections %}
+                            <option value="{{ value }}"{% if form.connection.value == value %} selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select>
                 {% else %}
