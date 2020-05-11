@@ -1,5 +1,6 @@
 {% load static %}
 {% load sass_tags %}
+{% load useful %}
 {% load render_bundle from webpack_loader %}
 
 <!doctype html>
@@ -91,9 +92,13 @@
                         <li class="govuk-header__navigation-item{% if request.get_full_path == logs_url %} govuk-header__navigation-item--active{% endif %}">
                             <a class="govuk-header__link" href="{{ logs_url }}">Logs</a>
                         </li>
-                        <li class="govuk-header__navigation-item{% if request.get_full_path == table_browser_url %} govuk-header__navigation-item--active{% endif %}">
-                            <a class="govuk-header__link" href="{{ table_browser_url }}">Table browser</a>
-                        </li>
+                        {% is_table_browser_enabled as table_browser %}
+                        {% if table_browser %}
+                            <li class="govuk-header__navigation-item{% if request.get_full_path == table_browser_url %} govuk-header__navigation-item--active{% endif %}">
+                                <a class="govuk-header__link" href="{{ table_browser_url }}">Table browser</a>
+                            </li>
+                        {% endif %}
+                        {% block additional_nav %}{% endblock %}
                     </ul>
                 </nav>
             </div>
