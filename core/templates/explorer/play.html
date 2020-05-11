@@ -1,5 +1,7 @@
 {% extends 'core/base.html' %}
 
+{% load static %}
+
 {% load i18n %}
 
 {% block content %}
@@ -55,7 +57,7 @@
 	  <button class="govuk-button" data-module="govuk-button">
 	    Refresh
 	  </button>
-	  <button class="govuk-button" data-module="govuk-button" type="button">
+	  <button class="govuk-button" data-module="govuk-button" id="create_button">
 	    Save and continue
 	  </button>
 	  <button class="govuk-button" data-module="govuk-button" type="button">
@@ -73,7 +75,9 @@
 	  <button class="govuk-button" data-module="govuk-button" type="button">
 	    Format
 	  </button>
-	</div>
+	  </div>
+
+          <input type="govuk-hidden" value="Playground Query" name="title" />
 	
       </fieldset>
     </form>
@@ -84,5 +88,11 @@
 </div>
 
 {% include 'explorer/preview_pane.html' %}
+
+<script>
+  document.getElementById("create_button").addEventListener("click", function(e){
+      document.getElementById("editor").setAttribute("action", "../new/");
+  })
+</script>
 
 {% endblock content %}
