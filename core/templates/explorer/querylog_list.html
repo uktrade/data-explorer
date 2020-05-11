@@ -17,9 +17,9 @@
     {% for object in recent_logs %}
     <tr class="govuk-table__row">
         <td class="govuk-table__cell">{{ object.run_at|date:"SHORT_DATETIME_FORMAT" }}</td>
-        <td class="govuk-table__cell">{{ object.run_by_user.email }}</td>
+        <td class="govuk-table__cell log-user">{{ object.run_by_user.first_name }} {{ object.run_by_user.last_name }}</td>
         <td class="govuk-table__cell">{{ object.duration|floatformat:2 }}ms</td>
-        <td class="govuk-table__cell">{{ object.sql }}</td>
+        <td class="govuk-table__cell log-sql"><div><pre>{{ object.sql }}</pre></div></td>
         <td class="govuk-table__cell">
             {% if object.query_id %}
             <a href="{% url 'query_detail' object.query_id %}">Query {{ object.query_id }}</a>

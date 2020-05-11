@@ -8,10 +8,28 @@
 }
 
 .pagination {
-  float: right;
+    float: right;
 }
 
 .pagination li {
-  display: inline;
-  padding-left: 4px;
+    display: inline;
+    padding-left: 4px;
 }
+
+.log-sql pre {
+    margin: 2px 0px;
+}
+
+.log-sql div {
+    max-width: 250px;
+    overflow: auto;
+    white-space: nowrap;
+    padding-right: 10px;
+}
+
+.log-user {
+    max-width: 200px;
+    overflow: auto;
+    white-space: nowrap;
+}
+
