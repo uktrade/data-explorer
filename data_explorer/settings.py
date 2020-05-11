@@ -283,3 +283,5 @@ def check_permissions(user):
 
 EXPLORER_PERMISSION_VIEW = check_permissions
 EXPLORER_PERMISSION_CHANGE = check_permissions
+
+ENABLE_TABLE_BROWSER = env.bool('ENABLE_TABLE_BROWSER', default=False)
