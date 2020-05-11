@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+
+{% load i18n %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-width-container">
+    <p class="govuk-heading-m govuk-!-margin-bottom-2">
+      Playground
+    </p>
+    <p class="govuk-body">The playground is for experimenting and writing ad-hoc queries. By default, nothing you do here will be saved.</p>
+
+    <form
+      role="form"
+      action="{% url 'explorer_playground' %}"
+      method="post"
+      id="editor">{% csrf_token %}
+
+      <fieldset class="govuk-fieldset">
+	{% if error %}
+	<span class="govuk-error-message">
+	  <span class="govuk-visually-hidden">Error:</span> {{ error|escape }}
+	</span>
+	{% endif %}
+
+	{% if form.connections|length > 1 %}
+	<div class="govuk-form-group">
+	  <label class="govuk-label" for="id_connection">
+	    Connection
+	  </label>
+          {{ form.connection }}
+	</div>
+	{% else %}
+	{# still need to submit the connection, just hide the UI element #}
+	<div class="govuk-visually-hidden">
+          {{ form.connection }}
+	</div>
+	{% endif %}
+
+	<div class="govuk-form-group">
+	  <label class="govuk-label" for="playground-sql">
+	    Playground SQL
+	  </label>
+	  <textarea
+	    class="govuk-textarea"
+	    id="playground-sql"
+	    name="sql"
+	    placeholder="Write query here"
+	    rows="10"
+	    aria-describedby="playground-sql">{{ query.sql }}</textarea>
+	</div>
+
+	  <div class="govuk-form-group">
+	    
+	  <button class="govuk-button" data-module="govuk-button">
+	    Refresh
+	  </button>
+	  <button class="govuk-button" data-module="govuk-button" type="button">
+	    Save and continue
+	  </button>
+	  <button class="govuk-button" data-module="govuk-button" type="button">
+	    Download CSV
+	  </button>
+	  <button class="govuk-button" data-module="govuk-button" type="button">
+	    Download Excel
+	  </button>
+	  <button class="govuk-button" data-module="govuk-button" type="button">
+	    Download JSON
+	  </button>
+	  <button class="govuk-button" data-module="govuk-button" type="button">
+	    Show Schema
+	  </button>
+	  <button class="govuk-button" data-module="govuk-button" type="button">
+	    Format
+	  </button>
+	</div>
+	
+      </fieldset>
+    </form>
+
+  </div>
+
+  
+</div>
+
+{% include 'explorer/preview_pane.html' %}
+
+{% endblock content %}
