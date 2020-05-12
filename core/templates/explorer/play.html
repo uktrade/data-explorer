@@ -103,62 +103,7 @@
 
 {% include 'explorer/preview_pane.html' %}
 
-<script>
-    document.getElementById("create_button").addEventListener("click", function(e){
-	document.getElementById("editor").setAttribute("action", "../new/");
-    });
-
-    document.getElementById("download_csv").addEventListener("click", function(e){
-	document.getElementById("editor").setAttribute("action", "../download?format=csv")
-    });
-
-    document.getElementById("download_excel").addEventListener("click", function(e){
-	document.getElementById("editor").setAttribute("action", "../download?format=excel")
-    });
-
-    document.getElementById("download_json").addEventListener("click", function(e){
-	document.getElementById("editor").setAttribute("action", "../download?format=json")
-    });
-
-    document.getElementById("show_schema_button")
-    .addEventListener(
-	"click",
-	function(e) {
-	    let element;
-	    
-	    document.getElementById("schema_frame")
-		.setAttribute(
-		    'src',
-		    '../schema/' + document.getElementById('id_connection').value
-		)
-
-	    element = document.getElementById("query_area");
-	    element.classList.remove("govuk-grid-column-full")
-	    element.classList.add("govuk-grid-column-two-thirds");
-
-	    element = document.getElementById("schema")
-	    element.classList.add("govuk-grid-column-one-third");
-	    element.style.display = "block";
-
-	}
-    );
-
-    
-    // ExplorerEditor.prototype.showSchema = function(noAutofocus) {
-    //     if (noAutofocus === true) {
-    //         $("#schema_frame").addClass('no-autofocus');
-    //     }
-    //     $("#query_area").removeClass("col-md-12").addClass("col-md-9");
-    //     var schema$ = $("#schema");
-    //     schema$.addClass("col-md-3");
-    //     schema$.show();
-    //     $("#show_schema_button").hide();
-    //     $("#hide_schema_button").show();
-    //     $.cookie('schema_sidebar_open', 1);
-    //     return false;
-    // };
-
-    
-</script>
+{% load render_bundle from webpack_loader %}
+{% render_bundle 'index' %}
 
 {% endblock content %}
