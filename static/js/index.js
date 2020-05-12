@@ -4,9 +4,12 @@ import Vue from 'vue'
 window.Vue = Vue;
 Vue.use(VueRx)
 
-document.getElementById("create_button").addEventListener("click", function(e){
-    document.getElementById("editor").setAttribute("action", "../new/");
-});
+var createButton = document.getElementById("create_button");
+if (createButton) {
+	createButton.addEventListener("click", function(e){
+		document.getElementById("editor").setAttribute("action", "../new/");
+	});
+}
 
 document.getElementById("download_csv").addEventListener("click", function(e){
     document.getElementById("editor").setAttribute("action", "../download?format=csv")
