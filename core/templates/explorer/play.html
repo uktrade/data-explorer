@@ -31,7 +31,13 @@
 			<label class="govuk-label" for="id_connection">
 			    Connection
 			</label>
-			{{ form.connection }}
+			<select class="govuk-select" id="id_connection">
+                            {% for value, label in form.connections %}
+                            <option class=value="{{ value }}"{% if form.connection.value == value %} selected{% endif %}>
+				{{ label }}
+			    </option>
+			    {% endfor %}
+			    </select>
 		    </div>
 		    {% else %}
 		    {# still need to submit the connection, just hide the UI element #}
