@@ -146,5 +146,9 @@
             <script src="{% static 'data_explorer/js/all.js' %}"></script>
             <script>window.GOVUKFrontend.initAll()</script>
         {% endblock %}
+
+        {% load render_bundle from webpack_loader %}
+        {% render_bundle 'index' %}
+	    
     </body>
 </html>

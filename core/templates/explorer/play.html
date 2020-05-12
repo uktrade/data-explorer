@@ -1,0 +1,109 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">
+	<div class="govuk-grid-column-full" id="query_area">
+	    <p class="govuk-heading-m govuk-!-margin-bottom-2">
+		Playground
+	    </p>
+	    <p class="govuk-body">The playground is for experimenting and writing ad-hoc queries. By default, nothing you do here will be saved.</p>
+
+	    <form
+		role="form"
+		action="{% url 'explorer_playground' %}"
+		method="post"
+		id="editor">{% csrf_token %}
+
+		<fieldset class="govuk-fieldset">
+		    {% if error %}
+		    <span class="govuk-error-message">
+			<span class="govuk-visually-hidden">Error:</span> {{ error|escape }}
+		    </span>
+		    {% endif %}
+
+		    {% if form.connections|length > 1 %}
+		    <div class="govuk-form-group">
+			<label class="govuk-label" for="id_connection">
+			    Connection
+			</label>
+			<select class="govuk-select" id="id_connection">
+                            {% for value, label in form.connections %}
+                            <option value="{{ value|lower }}"{% if form.connection.value == value %} selected{% endif %}>
+				{{ label }}
+			    </option>
+			    {% endfor %}
+			</select>
+		    </div>
+		    {% else %}
+		    {# still need to submit the connection, just hide the UI element #}
+		    <div class="govuk-visually-hidden">
+			{{ form.connection }}
+		    </div>
+		    {% endif %}
+
+		    <div class="govuk-form-group">
+			<label class="govuk-label" for="playground-sql">
+			    Playground SQL
+			</label>
+			<textarea
+			    class="govuk-textarea"
+			    id="playground-sql"
+			    name="sql"
+			    placeholder="Write query here"
+			    rows="10"
+			    aria-describedby="playground-sql"
+			    required>{{ query.sql }}</textarea>
+		    </div>
+
+		    <div class="govuk-form-group">
+			
+			<button class="govuk-button" data-module="govuk-button">
+			    Refresh
+			</button>
+			<button class="govuk-button" data-module="govuk-button" id="create_button">
+			    Save and continue
+			</button>
+			<button class="govuk-button" data-module="govuk-button" id="download_csv">
+			    Download CSV
+			</button>
+			<button class="govuk-button" data-module="govuk-button" id="download_excel">
+			    Download Excel
+			</button>
+			
+			<button class="govuk-button" data-module="govuk-button" id="download_json">
+			    Download JSON
+			</button>
+			
+			<button
+			    class="govuk-button"
+			    data-module="govuk-button"
+			    id="show_schema_button"
+			    type="button">
+			    Show Schema
+			</button>
+			
+			<button class="govuk-button" data-module="govuk-button" type="button">
+			    Format
+			</button>
+			
+		    </div>
+
+		    <input type="govuk-visually-hidden" value="Playground Query" name="title" hidden/>
+		    
+		</fieldset>
+	    </form>
+
+	</div>
+
+	<div id="schema" style="display: none;">
+	    <iframe src="about:blank" height="828px" frameBorder="0" id="schema_frame"></iframe>
+	</div>
+
+    </div>
+    
+</div>
+
+{% include 'explorer/preview_pane.html' %}
+
+{% endblock content %}
