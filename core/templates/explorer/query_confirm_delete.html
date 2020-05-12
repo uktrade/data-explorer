@@ -1,0 +1,13 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="govuk-label">
+            Are you sure you want to delete "{{ object.title }}" ?
+        </div>
+        <div>
+            <input type="submit" value="Delete Query" class="govuk-button" />
+        </div>
+    </form>
+{%  endblock %}
