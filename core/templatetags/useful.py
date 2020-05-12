@@ -6,7 +6,7 @@ register = template.Library()
 HOME_MENU_ITEM = 'home'
 LOGS_MENU_ITEM = 'logs'
 NEW_MENU_ITEM = 'new_query'
-PLAY_MENU_ITEM = 'play'
+PLAY_MENU_ITEM = 'playground'
 TABLE_BROWSER_MENU_ITEM = 'table_browser'
 
 
@@ -22,7 +22,7 @@ def get_active_menu(context):
         return HOME_MENU_ITEM
     if view_name == 'explorer_logs':
         return LOGS_MENU_ITEM
-    if view_name == 'explorer_play':
+    if view_name == 'explorer_playground':
         return PLAY_MENU_ITEM
     if view_name == 'query_create':
         return NEW_MENU_ITEM
