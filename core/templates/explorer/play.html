@@ -1,9 +1,5 @@
 {% extends 'core/base.html' %}
 
-{% load static %}
-
-{% load i18n %}
-
 {% block content %}
 <div class="govuk-width-container">
     <div class="govuk-grid-row">
@@ -33,11 +29,11 @@
 			</label>
 			<select class="govuk-select" id="id_connection">
                             {% for value, label in form.connections %}
-                            <option class=value="{{ value }}"{% if form.connection.value == value %} selected{% endif %}>
+                            <option value="{{ value|lower }}"{% if form.connection.value == value %} selected{% endif %}>
 				{{ label }}
 			    </option>
 			    {% endfor %}
-			    </select>
+			</select>
 		    </div>
 		    {% else %}
 		    {# still need to submit the connection, just hide the UI element #}
@@ -108,8 +104,5 @@
 </div>
 
 {% include 'explorer/preview_pane.html' %}
-
-{% load render_bundle from webpack_loader %}
-{% render_bundle 'index' %}
 
 {% endblock content %}
