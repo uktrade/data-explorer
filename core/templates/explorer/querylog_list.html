@@ -62,8 +62,9 @@
             {% if page_obj.paginator.num_pages > page_obj.number|add:'3' %}
             <li>&hellip;</li>
             {% endif %}
-        <li><a class="govuk-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages
-            }}</a></li>
+        <li><a class="govuk-link" href="?page={{ page_obj.paginator.num_pages }}">
+            {{ page_obj.paginator.num_pages }}
+        </a></li>
         {% endif %}
 
         {% if page_obj.has_next %}
