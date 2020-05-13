@@ -2,6 +2,7 @@
 {% load i18n %}
 
 {% block content %}
+
 <form method="post" name="pipeline_form" enctype="multipart/form-data">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -13,19 +14,18 @@
                     <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
                 </legend>
 
-                {% include 'form/input_field.html' with field=form.organisation %}
-                {% include 'form/input_field.html' with field=form.dataset %}
+                {% include 'form/input_field.html' with field=form.csv_file %}
 
                 <div class="gov-form-group govuk-!-padding-top-6">
                     <ul class="govuk-list">
                         <li>
-                            <input type="submit" value="{% trans 'Create' %}" class="govuk-button govuk-!-margin-bottom-4">
+                            <input type="submit" value="{% trans 'Upload' %}" class="govuk-button govuk-!-margin-bottom-4">
                         </li>
                     </ul>
-
                 </div>
             </fieldset>
         </div>
     </div>
 </form>
+
 {% endblock content %}
