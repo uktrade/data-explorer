@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'core',
+    'uploader',
     'explorer',
     'dynamic_models',
     'debug_toolbar',

@@ -19,8 +19,9 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('explorer.urls')),
     path('auth/', include('authbroker_client.urls', namespace='authbroker')),
+    path('upload/', include('uploader.urls', namespace='uploader')),
+    path('', include('explorer.urls')),
 ]
 
 
