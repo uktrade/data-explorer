@@ -1,8 +1,25 @@
-from .forms import PipelineForm, DataFileForm
+from .forms import PipelineForm, DataFileForm, PipelineSelectForm
 from .models import Pipeline
 
 from django.shortcuts import reverse, get_object_or_404
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, FormView
+from django.http import HttpResponseRedirect
+
+
+class PipelineSelectView(FormView):
+    template_name = 'dsu/pipeline_select.html'
+    form_class = PipelineSelectForm
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data['heading'] = 'Select pipeline'
+        return context_data
+
+    def form_valid(self, form):
+        url = reverse(
+            'uploader:pipeline-data-upload', kwargs={'slug': form.cleaned_data['pipeline'].slug}
+        )
+        return HttpResponseRedirect(url)
 
 
 class PipelineCreateView(CreateView):
@@ -11,7 +28,7 @@ class PipelineCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data['heading'] = 'Create pipeline'
+        context_data['heading'] = 'Create dataset'
         return context_data
 
     def get_success_url(self):
@@ -33,8 +50,9 @@ class PipelineDataUploadView(CreateView):
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data['heading'] = 'Upload data'
-        context_data['pipeline'] = self.get_pipeline()
+        pipeline = self.get_pipeline()
+        context_data['pipeline'] = pipeline
+        context_data['heading'] = f'Upload data to {pipeline} pipeline'
         return context_data
 
     def get_success_url(self):

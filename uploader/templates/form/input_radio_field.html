@@ -1,0 +1,17 @@
+<div class="govuk-form-group{% if field.errors %}--error{% endif %}">
+  <fieldset class="govuk-fieldset">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      <h1 class="govuk-fieldset__heading">{% if label %}{{ label }}{% else %}{{ field.label }}{% endif %}</h1>
+    </legend>
+    <div class="govuk-radios">
+      {% for field_id, field_name in field.field.choices %}
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="{{ field.name }}-{{ field_id }}" name="{{ field.name }}" type="radio" value="{{ field_id }}">
+        <label class="govuk-label govuk-radios__label" for="id_{{ field.name }}">
+            {{ field_name }}
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+  </fieldset>
+</div>

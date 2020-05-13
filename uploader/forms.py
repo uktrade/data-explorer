@@ -31,3 +31,10 @@ class DataFileForm(forms.ModelForm):
     ):
         self.instance.pipeline = self.pipeline
         return super().save(*args, **kwargs)
+
+
+class PipelineSelectForm(forms.Form):
+    pipeline = forms.ModelChoiceField(
+        queryset=Pipeline.objects.all(),
+        empty_label=None,
+    )

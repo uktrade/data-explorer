@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="govuk-panel govuk-panel--confirmation">
-    <h1 class="govuk-panel__title">Pipeline created</h1>
+    <h1 class="govuk-panel__title">Dataset pipeline created</h1>
     <div class="govuk-panel__body"><strong>{{ pipeline }}</strong></div>
 </div>
 <a href="{% url 'uploader:pipeline-data-upload' slug=pipeline.slug %}" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
