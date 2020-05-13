@@ -42,18 +42,24 @@
 		    </div>
 		    {% endif %}
 
-		    <div class="govuk-form-group">
+		    <div class="govuk-form-group {% if form.sql.errors %} govuk-form-group--error {% endif %}">
 			<label class="govuk-label" for="playground-sql">
 			    Playground SQL
 			</label>
+			{% if form.sql.errors %}
+				{% for error in form.sql.errors %}
+					<span id="sql-error" class="govuk-error-message">
+						<span class="govuk-visually-hidden">Error:</span> {{ error|escape }}
+					</span>
+				{% endfor %}
+			{% endif %}
 			<textarea
 			    class="govuk-textarea"
 			    id="playground-sql"
 			    name="sql"
 			    placeholder="Write query here"
 			    rows="10"
-			    aria-describedby="playground-sql"
-			    required>{{ query.sql }}</textarea>
+			    aria-describedby="playground-sql">{{ query.sql }}</textarea>
 		    </div>
 
 		    <div class="govuk-form-group">
