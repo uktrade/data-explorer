@@ -1,0 +1,61 @@
+
+{% extends "explorer/base.html" %}
+
+{% block sql_explorer_content_takeover %}
+
+<div class="govuk-width-container">
+    {% for m in schema %}
+        <div class="govuk-grid-row">
+            <h4>{{ m.0 }}</h4>
+            
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Column name</th>
+                    <th scope="col" class="govuk-table__header">Column type</th>
+                </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    {% for c in m.1 %}
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell"><code>{{ c.0 }}</code></td>
+                            <td class="govuk-table__cell"><small>{{ c.1 }}</small></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+
+{% block sql_explorer_footer %}{% endblock %}
+
+{% block sql_explorer_scripts %}
+<script>
+    $(function() {
+    function SearchFocus() {
+            if (!$(window.parent.document.getElementById("schema_frame")).hasClass('no-autofocus')) {
+    $(".search").focus();
+    }
+        }
+        var options = {
+            valueNames: [ 'name', 'app' ],
+            handlers: { 'updated': [SearchFocus] }
+        };
+        var tableList = new List('tables', options);
+
+        $('#collapse_all').click(function(){
+            $('.schema-table').hide();
+        });
+        $('#expand_all').click(function(){
+            $('.schema-table').show();
+        });
+        $('.schema-header').click(function(){
+            $(this).parent().find('.schema-table').toggle();
+        });
+    });
+</script>
+{% endblock %}
