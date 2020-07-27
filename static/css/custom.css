@@ -1,35 +1,51 @@
-
 .text-top {
     vertical-align: text-top;
 }
-
 .float-right {
     float: right;
 }
-
 .pagination {
     float: right;
 }
-
 .pagination li {
     display: inline;
     padding-left: 4px;
 }
-
 .log-sql pre {
     margin: 2px 0px;
 }
-
 .log-sql div {
     max-width: 250px;
     overflow: auto;
     white-space: nowrap;
     padding-right: 10px;
 }
-
 .log-user {
     max-width: 200px;
     overflow: auto;
     white-space: nowrap;
+}
+.scrollable-table {
+  width: 100%;
+  overflow-x: auto;
+  max-height: 560px;
+}
+.scrollable-table table thead th {
+  padding: 15px;
+  background-color: #dee0e2;
+  border-bottom: 0;
+  border-right: 2px solid #fff;
+  font-weight: normal;
+  min-width: 120px;
+  position: relative;
+  vertical-align: middle;
+}
+.scrollable-table table tbody td {
+  padding: 15px;
+  vertical-align: top;
+  border: none;
+}
+.scrollable-table table tbody tr:nth-child(even) td {
+  background-color: #f8f8f8;
 }
 
