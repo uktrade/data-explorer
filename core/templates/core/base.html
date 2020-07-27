@@ -79,11 +79,11 @@
                         <li class="govuk-header__navigation-item{% if active_menu == 'home' %} govuk-header__navigation-item--active{% endif %}">
                             <a class="govuk-header__link" href="{% url 'explorer_index' %}">Home</a>
                         </li>
-                        <li class="govuk-header__navigation-item{% if active_menu == 'new_query' %} govuk-header__navigation-item--active{% endif %}">
-                            <a class="govuk-header__link" href="{% url 'query_create' %}">New Query</a>
-                        </li>
                         <li class="govuk-header__navigation-item{% if active_menu == 'playground' %} govuk-header__navigation-item--active{% endif %}">
                             <a class="govuk-header__link" href="{% url 'explorer_playground' %}">Playground</a>
+                        </li>
+                        <li class="govuk-header__navigation-item{% if active_menu == 'new_query' %} govuk-header__navigation-item--active{% endif %}">
+                            <a class="govuk-header__link" href="{% url 'query_create' %}">New Query</a>
                         </li>
                         <li class="govuk-header__navigation-item{% if active_menu == 'logs' %} govuk-header__navigation-item--active{% endif %}">
                             <a class="govuk-header__link" href="{% url 'explorer_logs' %}">Logs</a>
