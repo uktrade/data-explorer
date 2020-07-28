@@ -117,6 +117,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'data_explorer.context_processors.expose_multiuser_setting',
             ],
         },
     },
@@ -138,6 +139,7 @@ def sort_database_config(database_list):
 
 VCAP_SERVICES = env.json('VCAP_SERVICES', {})
 if VCAP_SERVICES:
+    MULTIUSER_DEPLOYMENT = False
     VCAP_DATABASES = sort_database_config(VCAP_SERVICES['postgres'])
 
     DEFAULT_DATABASE_URL = VCAP_DATABASES[env('POSTGRES_DB')]
@@ -148,6 +150,7 @@ if VCAP_SERVICES:
         'datasets': dj_database_url.parse(DATASETS_DATABASE_URL),
     }
 else:
+    MULTIUSER_DEPLOYMENT = True
     POSTGRES_DB = env.str('POSTGRES_DB')
     POSTGRES_USER = env.str('POSTGRES_USER')
     POSTGRES_PASSWORD = env.str('POSTGRES_PASSWORD')
