@@ -33,22 +33,11 @@ SECRET_KEY = '%=g9vzldwcd9rvg5pefh%^60#wn+mecd0v0@d^9^)(f_1c7ae*'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='localhost').split(',')
+# In our deployments we don't have this exposed directly to the Internet and have host-header-based routing already,
+# so don't need Django to enforce this for us.
+ALLOWED_HOSTS = ['*']
 
 DEFAULT_SCHEMA = env.str('APP_SCHEMA', 'public')
-
-
-def get_allowed_host_from_schema():
-    if not DEFAULT_SCHEMA.startswith('_user_'):
-        return
-    user_id = DEFAULT_SCHEMA.replace('_user_', '')
-    return f'dataexplorer-{user_id}.data.trade.gov.uk'
-
-
-HOST_FROM_SCHEMA = get_allowed_host_from_schema()
-if HOST_FROM_SCHEMA:
-    ALLOWED_HOSTS += [HOST_FROM_SCHEMA]
-
 
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_COLLAPSED': True,
