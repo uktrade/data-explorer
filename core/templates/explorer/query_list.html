@@ -72,7 +72,7 @@
             <a href="{% url 'download_query' object.id %}">Download</a>
           </td>
           <td class="govuk-table__cell">{{ object.created_at|date:"SHORT_DATE_FORMAT" }}
-            {% if object.created_by_user %}
+            {% if object.created_by_user and MULTIUSER_DEPLOYMENT %}
             by {{ object.created_by_user }}
             {% endif %}
           </td>
