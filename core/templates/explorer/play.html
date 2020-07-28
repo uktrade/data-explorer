@@ -27,7 +27,7 @@
 			<label class="govuk-label" for="id_connection">
 			    Connection
 			</label>
-			<select class="govuk-select" id="id_connection">
+			<select class="govuk-select" id="id_connection" name="connection">
                             {% for value, label in form.connections %}
                             <option value="{{ value|lower }}"{% if form.connection.value == value %} selected{% endif %}>
 				{{ label }}
