@@ -10,7 +10,8 @@ https://docs.djangoproject.com/en/3.0/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
+from paste.translogger import TransLogger
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'data_explorer.settings')
 
-application = get_wsgi_application()
+application = TransLogger(get_wsgi_application())

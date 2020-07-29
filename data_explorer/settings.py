@@ -12,10 +12,13 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 import environ
 import dj_database_url
+import sentry_sdk
 
 from django.urls import reverse_lazy
 
 from dotenv import load_dotenv
+from sentry_sdk.integrations.django import DjangoIntegration
+
 load_dotenv()
 
 env = environ.Env()
@@ -278,3 +281,13 @@ EXPLORER_PERMISSION_VIEW = check_permissions
 EXPLORER_PERMISSION_CHANGE = check_permissions
 
 ENABLE_TABLE_BROWSER = env.bool('ENABLE_TABLE_BROWSER', default=False)
+
+if env.str("SENTRY_DSN", default='') != '':
+    if not MULTIUSER_DEPLOYMENT:
+        def _get_pool_options(_, __):
+            # We use self-signed certs in the (Data Workspace) proxy
+            return {'num_pools': 2, 'cert_reqs': 'CERT_NONE'}
+
+        sentry_sdk.transport.HttpTransport._get_pool_options = _get_pool_options
+
+    sentry_sdk.init(env.str('SENTRY_DSN'), integrations=[DjangoIntegration()])
