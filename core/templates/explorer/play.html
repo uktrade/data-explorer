@@ -53,14 +53,10 @@
 					</span>
 				{% endfor %}
 			{% endif %}
-			<textarea
-			    class="govuk-textarea"
-			    id="playground-sql"
-			    name="sql"
-			    placeholder="Write query here"
-			    rows="10"
-			    aria-describedby="playground-sql">{{ query.sql }}</textarea>
-		    </div>
+			<div class="govuk-textarea" id="gov-uk-sql-wrapper" rows="10">
+		   		<div id="ace-sql-editor">{{ query.sql }}</div>
+			</div>
+			<textarea style="display: none;" name="sql">{{ query.sql }}</textarea>
 
 		    <div class="govuk-form-group">
 			
