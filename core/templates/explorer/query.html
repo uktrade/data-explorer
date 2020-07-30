@@ -114,9 +114,9 @@
                         {% endfor %}
                     {% endif %}
                     <div class="govuk-textarea" id="gov-uk-sql-wrapper" rows="10">
-                        <div id="ace-sql-editor">{{ query.sql }}</div>
+                        <div id="ace-sql-editor">{% if form.sql.value %}{{ form.sql.value }}{% endif %}</div>
                     </div>
-                    <textarea style="display: none;" name="sql">{{ query.sql }}</textarea>
+                    <textarea style="display: none;" name="sql">{% if form.sql.value %}{{ form.sql.value }}{% endif %}</textarea>
                 </div>
 
                 <div class="govuk-form-group">
