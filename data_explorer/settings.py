@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 import environ
 import dj_database_url
+from django.db.models.signals import class_prepared
 import sentry_sdk
 
 from django.urls import reverse_lazy
@@ -291,3 +292,17 @@ if env.str("SENTRY_DSN", default='') != '':
         sentry_sdk.transport.HttpTransport._get_pool_options = _get_pool_options
 
     sentry_sdk.init(env.str('SENTRY_DSN'), integrations=[DjangoIntegration()])
+
+if not MULTIUSER_DEPLOYMENT:
+    def add_db_prefix(sender, **kwargs):
+
+        managed = sender._meta.managed
+        prefix = 'data_explorer_'
+
+        if not managed:
+            return
+
+        if not sender._meta.db_table.startswith(prefix):
+            sender._meta.db_table = prefix + sender._meta.db_table
+
+    class_prepared.connect(add_db_prefix)
