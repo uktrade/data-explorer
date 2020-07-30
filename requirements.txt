@@ -10,7 +10,7 @@ django-webpack-loader==0.7.0
 django==3.0.7
 flake8-import-order==0.18.1
 flake8==3.7.9
-git+https://github.com/uktrade/django-sql-explorer.git
+git+https://github.com/uktrade/django-sql-explorer.git@vendor-js-deps
 libsass==0.20.0
 paste==3.4.3
 psycopg2==2.8.4
