@@ -1,7 +1,7 @@
 FROM python:3.7 AS dev
 
 # Bump this to bust the docker build cache (e.g. on quay.io).
-ARG CACHE_BUST=2
+ARG CACHE_BUST=3
 
 RUN apt-get update -y
 
