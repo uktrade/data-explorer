@@ -80,6 +80,7 @@ import * as ace from 'ace-builds'
 import 'ace-builds/src-noconflict/mode-sql'
 import 'ace-builds/src-noconflict/theme-chrome'
 import 'ace-builds/src-noconflict/ext-language_tools'
+import sqlFormatter from "sql-formatter";
 
 var editor = ace.edit("ace-sql-editor", {
 	mode: "ace/mode/sql",
@@ -121,3 +122,11 @@ function update() {
 }
 editor.on("input", update);
 setTimeout(update, 100);
+
+document.getElementById("format_button")
+    .addEventListener("click", function(e) {
+        var sql = editor.getSession().getValue()
+        var formatted_sql = sqlFormatter.format(sql)
+        editor.getSession().setValue(formatted_sql)
+	}
+);

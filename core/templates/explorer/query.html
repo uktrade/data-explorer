@@ -104,7 +104,7 @@
                 <input type="hidden" id="id_created_by_user" name="created_by_user" value="{{ form.created_by_user_email }}" />
                 <div class="govuk-form-group {% if form.sql.errors %} govuk-form-group--error {% endif %}">
                     <label class="govuk-label" for="playground-sql">
-                        Playground SQL
+                        SQL
                     </label>
                     {% if form.sql.errors %}
                         {% for error in form.sql.errors %}
@@ -151,7 +151,7 @@
                         Show Schema
                     </button>
 
-                    <button class="govuk-button" data-module="govuk-button" type="button">
+                    <button class="govuk-button" data-module="govuk-button" type="button" id="format_button">
                         Format
                     </button>
 
