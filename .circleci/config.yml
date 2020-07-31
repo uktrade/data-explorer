@@ -53,7 +53,9 @@ job_defaults: &job_defaults
 
     - run:
         name: Compile assets
-        command: ./scripts/compile_assets.sh
+        command: |
+          npm install
+          ./scripts/compile_assets.sh
 
     - run:
         name: Run tests

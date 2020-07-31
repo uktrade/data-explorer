@@ -32,6 +32,7 @@ if [ -z "${COMPILE_ASSETS}" ];
 then
     :
 else
+    run "npm install"
     run "./scripts/compile_assets.sh"
 fi
 run "./scripts/compile_sass.sh"
