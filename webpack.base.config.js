@@ -9,6 +9,7 @@ module.exports = {
   context: __dirname,
   entry: {
     index: './static/js/index', // entry point of our app. static/js/index.js should require other js modules and dependencies it needs
+    query: './static/js/query',
     defaultVueApp: './static/js/vue/apps/default-app',
   },
   output: {
