@@ -10,13 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import os
-import environ
+
 import dj_database_url
-from django.db.models.signals import class_prepared
+import environ
 import sentry_sdk
-
+from django.conf.locale.en import formats as en_formats
+from django.db.models.signals import class_prepared
 from django.urls import reverse_lazy
-
 from dotenv import load_dotenv
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -306,3 +306,8 @@ if not MULTIUSER_DEPLOYMENT:
             sender._meta.db_table = prefix + sender._meta.db_table
 
     class_prepared.connect(add_db_prefix)
+
+
+# date and time formats
+en_formats.SHORT_DATE_FORMAT = "d/m/Y"
+en_formats.SHORT_DATETIME_FORMAT = "d/m/Y H:i"
