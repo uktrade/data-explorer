@@ -1,0 +1,5 @@
+.envrc
+.env
+.git
+node_modules
+_static

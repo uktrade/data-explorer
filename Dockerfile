@@ -18,5 +18,6 @@ COPY . /app
 
 FROM dev AS integrated
 
+RUN npm install
 RUN scripts/compile_assets.sh
 CMD /app/scripts/start.sh
