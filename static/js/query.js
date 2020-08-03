@@ -1,7 +1,10 @@
 // Buttons
-document.getElementById("create_button").addEventListener("click", function(e){
+var createButton = document.getElementById("create_button");
+if (createButton) {
+	createButton.addEventListener("click", function(e){
 		document.getElementById("editor").setAttribute("action", "../new/");
-});
+	});
+}
 
 document.getElementById("download_csv").addEventListener("click", function(e){
     document.getElementById("editor").setAttribute("action", "../download?format=csv")
@@ -122,3 +125,4 @@ document.getElementById("format_button")
         editor.getSession().setValue(formatted_sql)
 	}
 );
+
