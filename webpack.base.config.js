@@ -10,6 +10,7 @@ module.exports = {
   entry: {
     index: './static/js/index', // entry point of our app. static/js/index.js should require other js modules and dependencies it needs
     query: './static/js/query',
+    schema: './static/js/schema',
     defaultVueApp: './static/js/vue/apps/default-app',
   },
   output: {
@@ -29,6 +30,10 @@ module.exports = {
     new CopyPlugin([
       { from: path.resolve(__dirname, './node_modules/govuk-frontend/govuk/all.js'), to: path.resolve(__dirname, './static/js/') },
     ]),
+    new webpack.ProvidePlugin({
+       $: "jquery",
+       jQuery: "jquery"
+   })
   ],
   resolve: {
     modules: ['node_modules', 'bower_components'],

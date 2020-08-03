@@ -1,0 +1,22 @@
+{% load sass_tags %}
+
+<html>
+<head>
+    {% block styles %}
+        <link href="{% sass_src 'data_explorer/css/global.css' %}" rel="stylesheet" media="all"/>
+        <link href="{% sass_src 'data_explorer/css/custom.css' %}" rel="stylesheet" media="all"/>
+    {% endblock styles %}
+</head>
+<body>
+
+{% block sql_explorer_content_takeover %}
+
+  <div class="schema-wrapper">
+    <p class="govuk-heading-m">Schema is building...</p>
+    <div>Please wait a minute, and refresh.</div>
+  </div>
+
+{% endblock %}
+
+</body>
+</html>
