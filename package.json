@@ -31,6 +31,8 @@
     "eslint": "^6.8.0",
     "glob": "^7.1.4",
     "govuk-frontend": "^3.6.0",
+    "jquery": "^3.5.1",
+    "list.js": "^1.5.0",
     "nunjucks": "^3.2.0",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",

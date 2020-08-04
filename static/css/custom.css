@@ -60,3 +60,58 @@
     height: 100%;
     position: relative;
 }
+
+.list {
+    -webkit-padding-start: 0px;
+    list-style: none;
+}
+
+.schema-wrapper{
+    overflow-x: hidden;
+}
+
+.schema-panel {
+    background-color: white;
+    padding: 0px;
+    border: 1px solid black;
+    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.schema-title {
+    background-color: lightgrey;
+    padding: 10px;
+    margin-bottom: 0px;
+    font-size: 15px;
+    word-break: break-word;
+}
+
+.schema-table {
+    background-color: white;
+    padding: 5px;
+}
+
+.schema-cell-left {
+    font-size: 0.8rem;
+    padding: 5px 5px 5px 5;
+    word-break: break-word;
+}
+
+.schema-cell-right {
+    font-size: 0.8rem;
+    padding: 5px 5px 5px 5;
+}
+
+.schema-collapse {
+    width: 50%;
+    float: left;
+    text-align: center;
+    color: #337ab7;
+}
+
+.schema-expand {
+    width: 50%;
+    float: right;
+    text-align: center;
+    color: #337ab7;
+}

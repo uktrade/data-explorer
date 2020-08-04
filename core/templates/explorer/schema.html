@@ -1,0 +1,67 @@
+{% load sass_tags %}
+
+<html>
+<head>
+    {% block styles %}
+        <link href="{% sass_src 'data_explorer/css/global.css' %}" rel="stylesheet" media="all"/>
+        <link href="{% sass_src 'data_explorer/css/custom.css' %}" rel="stylesheet" media="all"/>
+    {% endblock styles %}
+</head>
+<body>
+
+{% block sql_explorer_content_takeover %}
+<div class="govuk-width-container schema-wrapper" id="schema-wrapper-loaded" style="display: none">
+    <p class="govuk-heading-m">Schema</p>
+    <div id="tables">
+        <p class="">
+          <input class="govuk-input search"
+                 placeholder="Search" />
+        </p>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-half govuk-link schema-collapse">
+                <p id="collapse_all">Collapse All</p>
+            </div>
+            <div class="govuk-grid-column-one-half govuk-link schema-expand">
+                <p id="expand_all">Expand All</p>
+            </div>
+        </div>
+        <ul class="list">
+            {% for m in schema %}
+                <li>
+                    <div class="govuk-panel schema-panel">
+                        <h1 class="schema-header govuk-panel__title schema-title">
+                            {{ m.0 }}
+                        </h1>
+                        <div class="govuk-panel__body schema-table">
+                            <table class="govuk-table">
+                                <thead class="govuk-table__head">
+                                </thead>
+                                <tbody class="govuk-table__body">
+                                {% for c in m.1 %}
+                                    <tr class="govuk-table__row">
+                                      <th scope="row" class="govuk-table__header schema-cell-left">{{ c.0 }}</th>
+                                      <td class="govuk-table__cell schema-cell-right">{{ c.1 }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block sql_explorer_footer %}{% endblock %}
+
+{% block sql_explorer_scripts %}
+
+{% load render_bundle from webpack_loader %}
+{% render_bundle 'schema' %}
+
+{% endblock %}
+
+</body>
+</html>
