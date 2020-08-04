@@ -67,7 +67,54 @@ document.getElementById("show_schema_button")
 	    }
 		   
 	}
-    );
+);
+
+
+// Lifted from django-sql-explorer explorer.js
+function updateQueryString(key, value, url) {
+    // http://stackoverflow.com/a/11654596/221390
+    if (!url) url = window.location.href;
+    var re = new RegExp("([?&])" + key + "=.*?(&|#|$)(.*)", "gi"),
+        hash = url.split('#');
+
+    if (re.test(url)) {
+        if (typeof value !== 'undefined' && value !== null)
+            return url.replace(re, '$1' + key + "=" + value + '$2$3');
+        else {
+            url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null)
+                url += '#' + hash[1];
+            return url;
+        }
+    }
+    else {
+        if (typeof value !== 'undefined' && value !== null) {
+            var separator = url.indexOf('?') !== -1 ? '&' : '?';
+            url = hash[0] + separator + key + '=' + value;
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null)
+                url += '#' + hash[1];
+            return url;
+        }
+        else
+            return url;
+    }
+};
+
+let fetchPage = document.getElementById('fetch-page');
+if (fetchPage !== null) {
+    fetchPage.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        let editor = document.getElementById('editor');
+        let queryPage = document.getElementById('query-page');
+        let queryRows = document.getElementById('query-rows');
+
+        if (editor != null && queryPage !== null && queryRows !== null) {
+            editor.action = updateQueryString('page', queryPage.value, updateQueryString('rows', queryRows.value, editor.action));
+            editor.submit();
+        }
+    });
+}
 
 
 // SQL Editor

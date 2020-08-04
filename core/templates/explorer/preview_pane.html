@@ -42,7 +42,20 @@
 				</thead>
 			</table>
     	</div>
+
+    <div class="govuk-grid-row govuk-!-margin-top-4" style="float: right">
+      <div class="govuk-grid-column-full">
+        <form id="fetch-page">
+          <span class="govuk-label app-label--inline" for="query-page">Show page </span>
+          <input class="govuk-input govuk-input--width-5 app-input--inline" id="query-page" name="query-page" value="{{ page }}" />
+          <span class="govuk-body"> with </span>
+          <input class="govuk-input govuk-input--width-5 app-input--inline" id="query-rows" name="query-rows" value="{{ rows }}" type="number" />
+          <span class="govuk-label app-label--inline" for="query-rows"> results per page</span>
+          <input class="govuk-button govuk-!-margin-left-5" type="submit" value="Fetch page" />
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 
 {% endif %}
