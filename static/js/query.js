@@ -6,6 +6,14 @@ if (createButton) {
 	});
 }
 
+document.getElementById("save_button").addEventListener("click", function(e){
+    document.getElementById("editor").setAttribute("action", "")
+});
+
+document.getElementById("save_only").addEventListener("click", function(e){
+    document.getElementById("editor").setAttribute("action", "")
+});
+
 document.getElementById("download_csv").addEventListener("click", function(e){
     document.getElementById("editor").setAttribute("action", "../download?format=csv")
 });
