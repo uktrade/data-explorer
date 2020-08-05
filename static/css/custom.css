@@ -115,3 +115,12 @@
     text-align: center;
     color: #337ab7;
 }
+
+
+.app-label--inline, .app-input--inline {
+    display: inline;
+}
+
+.app-pagination-controls {
+    float: right;
+}
