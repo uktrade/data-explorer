@@ -9,9 +9,4 @@ else
     export REDIS_URL=$(echo $VCAP_SERVICES | jq -r '.redis[0].credentials.uri')
 fi
 
-run "./scripts/compile_assets.sh"
-run "./scripts/compile_sass.sh"
-
-run "python manage.py migrate --noinput"
-
-run "waitress-serve --port=$PORT data_explorer.wsgi:application"
+run "celery -A data_explorer worker"

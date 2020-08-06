@@ -23,7 +23,3 @@ $(function() {
         $(this).parent().find('.schema-table').toggle();
     });
 });
-
-window.onload = function() {
-    document.getElementById("schema-wrapper-loaded").style.display = "block";
-};

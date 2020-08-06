@@ -23,3 +23,18 @@ services:
       - '5433:5432'
     env_file: .env
 
+  explorer_celery:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    entrypoint: dockerize -wait tcp://explorer_db:5432 -wait tcp://explorer_redis:6379 -wait tcp://explorer:8000 -timeout 360s
+    env_file: .env
+    command: /app/scripts/start_celery.sh
+
+  explorer_redis:
+    image: redis:3.2
+    restart: always
+    ports:
+      - "6378:6379"
+

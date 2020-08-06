@@ -36,5 +36,4 @@ else
     run "./scripts/compile_assets.sh"
 fi
 run "./scripts/compile_sass.sh"
-
 run "./scripts/start_server.sh"
