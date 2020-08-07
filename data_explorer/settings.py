@@ -48,7 +48,6 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -130,6 +129,8 @@ def sort_database_config(database_list):
     return config
 
 
+MULTIUSER_DEPLOYMENT = env.bool('MULTIUSER_DEPLOYMENT', default=False)
+
 VCAP_SERVICES = env.json('VCAP_SERVICES', {})
 if VCAP_SERVICES:
     MULTIUSER_DEPLOYMENT = True
@@ -143,7 +144,6 @@ if VCAP_SERVICES:
         'datasets': dj_database_url.parse(DATASETS_DATABASE_URL),
     }
 else:
-    MULTIUSER_DEPLOYMENT = False
     POSTGRES_DB = env.str('POSTGRES_DB')
     POSTGRES_USER = env.str('POSTGRES_USER')
     POSTGRES_PASSWORD = env.str('POSTGRES_PASSWORD')
@@ -176,7 +176,7 @@ else:
         'datasets': DATASETS_DB_CONFIG
     }
 
-EXPLORER_CONNECTIONS = {'Default': 'default', 'Datasets': 'datasets'}
+EXPLORER_CONNECTIONS = {'default': 'default', 'datasets': 'datasets'}
 EXPLORER_DEFAULT_CONNECTION = 'datasets'
 
 # Password validation
@@ -294,6 +294,10 @@ if env.str("SENTRY_DSN", default='') != '':
     sentry_sdk.init(env.str('SENTRY_DSN'), integrations=[DjangoIntegration()])
 
 if not MULTIUSER_DEPLOYMENT:
+    # Data Workspace Setup
+
+    # to make clear which tables in the user schema belong to data-explorer
+    # the tables are prefixed with data_explorer
     def add_db_prefix(sender, **kwargs):
 
         managed = sender._meta.managed
@@ -307,6 +311,38 @@ if not MULTIUSER_DEPLOYMENT:
 
     class_prepared.connect(add_db_prefix)
 
+    # because schema permissions remain the same during a session, asynchronous schema loading
+    # is disabled. the schema cache is build only once at startup in the urls module.
+    EXPLORER_TASKS_ENABLED = False
+    EXPLORER_ASYNC_SCHEMA = False
+
+    # Cache
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
+
+else:
+    # asynchronous schema loading
+    EXPLORER_TASKS_ENABLED = True
+    EXPLORER_ASYNC_SCHEMA = True
+
+    # Celery
+    CELERY_BROKER_URL = env.str('REDIS_URL', '')
+    CELERY_ACCEPT_CONTENT = ['pickle', 'json']
+
+    # Cache
+    CACHES = {
+        'default': {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": env.str('REDIS_URL', ''),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient"
+            },
+        }
+    }
 
 # date and time formats
 en_formats.SHORT_DATE_FORMAT = "d/m/Y"
