@@ -22,7 +22,7 @@
                     {% if shared %}
                         <small>&nbsp;&nbsp;shared</small>
                     {% endif %}
-                    <a href="{% url 'explorer_logs' %}?query_id={{ query.id }}">History</a>
+                    <a class="govuk-link" href="{% url 'explorer_logs' %}?query_id={{ query.id }}">History</a>
                 {% else %}
                     New Query
                 {% endif %}
