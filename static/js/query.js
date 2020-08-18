@@ -150,6 +150,9 @@ var editor = ace.edit("ace-sql-editor", {
 	showPrintMargin: false
 });
 
+editor.commands.removeCommand(editor.commands.byName.indent);
+editor.commands.removeCommand(editor.commands.byName.outdent);
+
 var textarea = document.getElementsByName("sql")[0];
 editor.getSession().on("change", function () {
     textarea.value = editor.getSession().getValue();

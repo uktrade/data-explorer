@@ -1,5 +1,5 @@
 {% extends "core/base.html" %}
-
+{% block title %}Data Explorer - Delete query{% endblock %}
 {% block content %}
     <form method="post">
         {% csrf_token %}
@@ -7,7 +7,7 @@
             Are you sure you want to delete "{{ object.title }}" ?
         </div>
         <div>
-            <input type="submit" value="Delete Query" class="govuk-button" />
+            <input type="submit" value="Delete Query" class="govuk-button govuk-button--warning" />
         </div>
     </form>
 {%  endblock %}

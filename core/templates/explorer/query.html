@@ -2,6 +2,8 @@
 
 {% load explorer_tags %}
 
+{% block title %}{% if form.errors %}Error: {% endif%}Data Explorer - New query{% endblock %}
+
 {% block sql_explorer_navlinks %}
     {% if can_change %}
         <li{% if not query %} class="active" {% endif %}><a href="{% url 'query_create' %}">New Query</a></li>
@@ -16,7 +18,25 @@
 <div class="govuk-width-container">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full" id="query_area">
-            <p class="govuk-heading-m govuk-!-margin-bottom-2">
+            {% if form.errors %}
+                <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+                    <h2 class="govuk-error-summary__title" id="error-summary-title">
+                        There is a problem
+                    </h2>
+                    <div class="govuk-error-summary__body">
+                        <ul class="govuk-list govuk-error-summary__list">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>
+                                        <a href="#id_{{ field }}">{{ error }}</a>
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+            <h1 class="govuk-heading-m govuk-!-margin-bottom-2">
                 {% if query %}
                     {{ query.title }}
                     {% if shared %}
@@ -26,10 +46,9 @@
                 {% else %}
                     New Query
                 {% endif %}
-            </p>
+            </h1>
             <fieldset class="govuk-fieldset">
                 {% if message %}
-
                     <div class="govuk-warning-text">
                         <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
                         <strong class="govuk-warning-text__text">
@@ -42,25 +61,6 @@
                     <form action="{% url 'query_detail' query.id %}" method="post" id="editor">{% csrf_token %}
                 {% else %}
                     <form action="{% url 'query_create' %}" method="post" id="editor">{% csrf_token %}
-                {% endif %}
-
-                {% if error %}
-                    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-                        <h2 class="govuk-error-summary__title" id="error-summary-title">
-                            {{ error|escape }}
-                        </h2>
-                        {% if form.non_field_errors %}
-                            <div class="govuk-error-summary__body">
-                                <ul class="govuk-list govuk-error-summary__list">
-                                    {% for error in form.non_field_errors %}
-                                        <li>
-                                            {{ error }}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
-                    </div>
                 {% endif %}
 
                 <div class="govuk-form-group{% if form.title.errors %} govuk-form-group--error {% endif %}">
@@ -96,16 +96,16 @@
                 </div>
 
                 <div class="govuk-form-group">
-                    <label class="govuk-label" for="id_connection">
+                    <label class="govuk-label" for="id_description">
                         Description
                     </label>
                     <textarea class="govuk-textarea" id="id_description" name="description" cols="40" rows="2"  {% if not can_change %}disabled{% endif %}>{{ form.description.value|default_if_none:"" }}</textarea>
                 </div>
                 <input type="hidden" id="id_created_by_user" name="created_by_user" value="{{ form.created_by_user_email }}" />
                 <div class="govuk-form-group {% if form.sql.errors %} govuk-form-group--error {% endif %}">
-                    <label class="govuk-label" for="playground-sql">
+                    <p class="govuk-label" for="playground-sql">
                         SQL
-                    </label>
+                    </p>
                     {% if form.sql.errors %}
                         {% for error in form.sql.errors %}
                             <span id="sql-error" class="govuk-error-message">
@@ -116,7 +116,7 @@
                     <div class="govuk-textarea" id="gov-uk-sql-wrapper" rows="10">
                         <div id="ace-sql-editor">{% if form.sql.value %}{{ form.sql.value }}{% endif %}</div>
                     </div>
-                    <textarea style="display: none;" name="sql">{% if form.sql.value %}{{ form.sql.value }}{% endif %}</textarea>
+                    <textarea aria-label="Sql" style="display: none;" name="sql">{% if form.sql.value %}{{ form.sql.value }}{% endif %}</textarea>
                 </div>
 
                 <div class="govuk-form-group">
@@ -124,7 +124,7 @@
                         <button class="govuk-button" data-module="govuk-button" id="save_button">
                             Save & Run
                         </button>
-                        <button class="govuk-button" data-module="govuk-button" id="save_only">
+                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button" id="save_only">
                             Save only
                         </button>
                     {% else %}
@@ -132,26 +132,26 @@
                             Refresh
                         </button>
                     {% endif %}
-                    <button class="govuk-button" data-module="govuk-button" id="download_csv">
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" id="download_csv">
                         Download CSV
                     </button>
-                    <button class="govuk-button" data-module="govuk-button" id="download_excel">
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" id="download_excel">
                         Download Excel
                     </button>
 
-                    <button class="govuk-button" data-module="govuk-button" id="download_json">
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" id="download_json">
                         Download JSON
                     </button>
 
                     <button
-                        class="govuk-button"
+                        class="govuk-button govuk-button--secondary"
                         data-module="govuk-button"
                         id="show_schema_button"
                         type="button">
                         Show Schema
                     </button>
 
-                    <button class="govuk-button" data-module="govuk-button" type="button" id="format_button">
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="button" id="format_button">
                         Format
                     </button>
 

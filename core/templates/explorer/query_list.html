@@ -1,13 +1,15 @@
 {% extends 'core/base.html' %}
 
-
+{% block title %}Data Explorer - Queries{% endblock %}
 {% block content %}
+<h1 class="govuk-heading-m govuk-!-margin-bottom-6">Home</h1>
+    
 <div class="govuk-grid-row">
   <div class="govuk-width-container">
     {% if recent_queries|length > 0 %}
-    <p class="govuk-heading-m govuk-!-margin-bottom-2">
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
       Your&nbsp;{{ recent_queries|length }}&nbsp;Most Recently Run
-    </p>
+    </h2>
 
     <table class="govuk-table">
       <thead class="govuk-table__head">
@@ -40,7 +42,7 @@
   </div>
   
   <div class="govuk-width-container">
-    <p class="govuk-heading-m govuk-!-margin-bottom-2">All Queries</p>
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">All Queries</h2>
 
     <table class="govuk-table">
       <thead class="govuk-table__head">
