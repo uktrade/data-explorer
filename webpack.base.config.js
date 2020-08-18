@@ -27,9 +27,11 @@ module.exports = {
   plugins: [
     new BundleTracker({filename: './webpack-stats.json'}),
     new VueLoaderPlugin(),
-    new CopyPlugin([
-      { from: path.resolve(__dirname, './node_modules/govuk-frontend/govuk/all.js'), to: path.resolve(__dirname, './static/js/') },
-    ]),
+    new CopyPlugin({
+        patterns: [
+            { from: path.resolve(__dirname, './node_modules/govuk-frontend/govuk/all.js'), to: path.resolve(__dirname, './static/js/') }
+        ]
+    }),
     new webpack.ProvidePlugin({
        $: "jquery",
        jQuery: "jquery"
