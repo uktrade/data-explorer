@@ -1,4 +1,10 @@
 // Buttons
+var refreshButton = document.getElementById("refresh_button");
+if (refreshButton) {
+	refreshButton.addEventListener("click", function(e){
+		document.getElementById("editor").setAttribute("action", "");
+	});
+}
 var createButton = document.getElementById("create_button");
 if (createButton) {
 	createButton.addEventListener("click", function(e){
