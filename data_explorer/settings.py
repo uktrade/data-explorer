@@ -176,7 +176,7 @@ else:
         'datasets': DATASETS_DB_CONFIG
     }
 
-EXPLORER_CONNECTIONS = {'default': 'default', 'datasets': 'datasets'}
+EXPLORER_CONNECTIONS = {'datasets': 'datasets'}
 EXPLORER_DEFAULT_CONNECTION = 'datasets'
 
 EXPLORER_SCHEMA_EXCLUDE_TABLE_PREFIXES = ('auth_', 'contenttypes_', 'sessions_', 'admin_', 'data_explorer_', 'django', 'dynamic_models')
