@@ -179,6 +179,8 @@ else:
 EXPLORER_CONNECTIONS = {'default': 'default', 'datasets': 'datasets'}
 EXPLORER_DEFAULT_CONNECTION = 'datasets'
 
+EXPLORER_SCHEMA_EXCLUDE_TABLE_PREFIXES = ('auth_', 'contenttypes_', 'sessions_', 'admin_', 'data_explorer_', 'django', 'dynamic_models')
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
