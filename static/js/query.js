@@ -130,7 +130,15 @@ if (fetchPage !== null) {
         let queryRows = document.getElementById('query-rows');
 
         if (editor != null && queryPage !== null && queryRows !== null) {
-            editor.action = updateQueryString('page', queryPage.value, updateQueryString('rows', queryRows.value, editor.action));
+            editor.action = updateQueryString(
+                'page',
+                queryPage.value,
+                updateQueryString(
+                    'rows',
+                    queryRows.value,
+                    '.'
+                )
+            );
             editor.submit();
         }
     });
