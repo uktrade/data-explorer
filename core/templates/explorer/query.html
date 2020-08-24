@@ -89,8 +89,8 @@
                         </select>
                     {% else %}
                         {# still need to submit the connection, just hide the UI element #}
-                        <div class="hidden">
-                        {{ form.connection }}
+                        <div style="display: none">
+                          {{ form.connection }}
                         </div>
                     {% endif %}
                 </div>
