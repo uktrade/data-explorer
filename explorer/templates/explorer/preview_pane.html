@@ -1,3 +1,5 @@
+{% load explorer_tags %}
+
 {% if headers %}
 
 <div class="govuk-grid-row">
@@ -6,7 +8,7 @@
 			Preview
 		</p>
 		<p class="govuk-body">
-			Execution time: {{ duration|floatformat:2 }} ms
+			Execution time: {{ duration|format_duration }}
 		</p>
 		<p class="govuk-body">
 			{% if rows > total_rows %}
