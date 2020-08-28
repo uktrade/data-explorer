@@ -50,7 +50,7 @@ document.getElementById("show_schema_button")
 
 	    element.setAttribute(
 		'src',
-		'../schema/' + document.getElementById('id_connection').value
+		'../schema-pane/' + document.getElementById('id_connection').value
 	    );
 
 	    let schemaHidden = element.getAttribute('schemaHidden');

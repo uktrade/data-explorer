@@ -1,3 +1,4 @@
+import json
 import re
 from collections import Counter
 
@@ -11,6 +12,7 @@ from django.db.models import Count
 from django.forms.models import model_to_dict
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.clickjacking import xframe_options_sameorigin
@@ -81,20 +83,29 @@ class DownloadFromSqlView(View):
         return _export(request, query)
 
 
-class SchemaView(View):
+class SchemaPaneView(View):
     @method_decorator(xframe_options_sameorigin)
     def dispatch(self, *args, **kwargs):
-        return super(SchemaView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         connection = kwargs.get('connection')
-        if connection not in connections:
-            raise Http404
-        schema = schema_info(connection)
-        if schema is not None:
-            return render(None, 'explorer/schema.html', {'schema': schema_info(connection)})
-        else:
-            return render(None, 'explorer/schema_building.html')
+        context = {'connection': connection, 'schema': _get_schema_html(connection)}
+        return render(None, 'explorer/schema_pane.html', context)
+
+
+class SchemaView(View):
+    def get(self, request, *args, **kwargs):
+        connection = kwargs.get('connection')
+        schema_html = _get_schema_html(connection)
+        return HttpResponse(json.dumps({'schema': schema_html}), content_type='application/json')
+
+
+def _get_schema_html(connection):
+    if connection not in connections:
+        raise Http404
+    schema = schema_info(connection)
+    return render_to_string('explorer/schema.html', {'schema': schema}) if schema else ""
 
 
 @require_POST
