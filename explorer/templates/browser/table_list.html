@@ -1,0 +1,35 @@
+{% extends "explorer/base.html" %}
+
+{% block sql_explorer_navlinks %}
+    <li><a href="{% url "query_create" %}">New Query</a></li>
+    <li><a href="{% url "explorer_playground" %}">Playground</a></li>
+    <li><a href="{% url "explorer_logs" %}">Logs</a></li>
+    <li class="active"><a href="{% url "connection_browser_list" %}">Table browser</a></li>
+{% endblock %}
+
+{% block sql_explorer_content %}
+<a href="{% url "connection_browser_list" %}">Back to connections</a>
+<h3>All tables</h3>
+<div class="table-responsive">
+    <table class="table table-striped query-list">
+        <thead>
+            <tr>
+                <th>Schema</th>
+                <th>Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for table in tables %}
+            <tr>
+                <td>{{ table.name.schema }}</td>
+                <td>{{ table.name.name }}</td>
+                <td><a href="{% url "table_browser_detail" connection=connection schema=table.name.schema table=table.name.name %}">Explore</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}

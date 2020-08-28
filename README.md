@@ -11,6 +11,3 @@ To use the django development server add the following setting to `.env`
  - `docker exec -ti data_explorer_1 /bin/bash`
  - `/manage.py runserver_plus 0.0.0.0:8000`
  
-A super user is required to access the explorer
- - `docker exec -ti data_explorer_1 /bin/bash`
- - `./manage.py createsuperuser` 

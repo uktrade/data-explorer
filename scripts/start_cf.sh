@@ -14,4 +14,4 @@ run "./scripts/compile_sass.sh"
 
 run "python manage.py migrate --noinput"
 
-run "waitress-serve --port=$PORT data_explorer.wsgi:application"
+run "waitress-serve --port=$PORT explorer.wsgi:application"

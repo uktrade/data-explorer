@@ -9,4 +9,4 @@ else
     export REDIS_URL=$(echo $VCAP_SERVICES | jq -r '.redis[0].credentials.uri')
 fi
 
-run "celery -A data_explorer worker"
+run "celery -A explorer worker"

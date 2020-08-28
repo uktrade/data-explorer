@@ -4,11 +4,11 @@ CHECK ?= --check
 
 .PHONY: run_tests
 run_tests:
-	DEBUG=False pytest -v ${TEST}
+	DJANGO_SETTINGS_MODULE=explorer.settings.test DEBUG=True pytest -v ${TEST}
 
 .PHONY: run_tests_local
 run_tests_local:
-	USE_DOTENV=1 TESTING=1 pytest -s ${TEST}
+	DJANGO_SETTINGS_MODULE=explorer.settings.test DEBUG=True pytest -s ${TEST}
 
 check: flake8 black
 

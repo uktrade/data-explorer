@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "clean-bundles": "rimraf _static/js/bundles data_explorer/static/js/bundles",
+    "clean-bundles": "rimraf _static/js/bundles explorer/static/js/bundles",
     "start": "webpack --config webpack.local.config.js  --watch --progress --colors",
     "prestart": "npm run clean-bundles",
     "build": "webpack --config webpack.prod.config.js --progress --colors",

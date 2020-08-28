@@ -22,7 +22,6 @@ var/
 assets/
 _static/
 test_assets/
-*/static/
 dit_helpdesk/static/
 wheels/
 *.egg-info/

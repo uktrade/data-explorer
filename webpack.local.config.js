@@ -8,7 +8,7 @@ var config = require('./webpack.base.config.js')
 config.mode = 'none';
 
 config.output = {
-  path: path.resolve(__dirname, './_static/data_explorer/js/bundles/'),
+  path: path.resolve('assets/bundles/'),
   filename: "[name]-[hash].js",
 };
 

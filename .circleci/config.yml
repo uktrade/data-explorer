@@ -10,7 +10,7 @@ job_defaults: &job_defaults
 
   environment:
     DJANGO_SECRET_KEY: test
-    DJANGO_SETTINGS_MODULE: data_explorer.test_settings
+    DJANGO_SETTINGS_MODULE: explorer.settings.test
     DEBUG: True
     OAUTHLIB_INSECURE_TRANSPORT: 1
     POSTGRES_DB: postgres
@@ -18,7 +18,7 @@ job_defaults: &job_defaults
     POSTGRES_PASSWORD: postgres
     POSTGRES_PORT: 5432
     POSTGRES_USER: postgres
-
+    TEST_DATABASE_URL: postgresql://postgres@localhost:5432/postgres
 
   working_directory: ~/app
 
@@ -58,8 +58,13 @@ job_defaults: &job_defaults
           ./scripts/compile_assets.sh
 
     - run:
+        name: Run format checks
+        command: |
+          make check
+    - run:
         name: Run tests
-        command: python -m pytest -v .
+        command: |
+          make run_tests
 
 
 jobs:
