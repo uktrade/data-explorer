@@ -359,7 +359,9 @@ class TestSchemaView(TestCase):
         self.user = User.objects.create_superuser('admin', 'admin@admin.com', 'pwd')
         self.client.login(username='admin', password='pwd')
 
-    def test_returns_schema_contents(self):
+    @patch('explorer.schema.do_async')
+    def test_returns_schema_contents(self, mocked_async_check):
+        mocked_async_check.return_value = False
         resp = self.client.get(
             reverse("explorer_schema", kwargs={'connection': EXPLORER_CONNECTIONS['Postgres']})
         )
@@ -377,7 +379,7 @@ class TestSchemaView(TestCase):
         resp = self.client.get(
             reverse("explorer_schema", kwargs={'connection': EXPLORER_CONNECTIONS['Postgres']})
         )
-        self.assertTemplateUsed(resp, 'explorer/schema_building.html')
+        self.assertContains(resp, '{"schema": ""}')
 
 
 class TestFormat(TestCase):
