@@ -27,15 +27,15 @@ if (save_only !== null) {
 }
 
 document.getElementById("download_csv").addEventListener("click", function(e){
-    document.getElementById("editor").setAttribute("action", "../download?format=csv")
+    document.getElementById("editor").setAttribute("action", "../download/?format=csv")
 });
 
 document.getElementById("download_excel").addEventListener("click", function(e){
-    document.getElementById("editor").setAttribute("action", "../download?format=excel")
+    document.getElementById("editor").setAttribute("action", "../download/?format=excel")
 });
 
 document.getElementById("download_json").addEventListener("click", function(e){
-    document.getElementById("editor").setAttribute("action", "../download?format=json")
+    document.getElementById("editor").setAttribute("action", "../download/?format=json")
 });
 
 document.getElementById("show_schema_button")
