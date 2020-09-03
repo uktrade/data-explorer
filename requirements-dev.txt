@@ -1,0 +1,5 @@
+-r requirements.txt
+
+pyppeteer==0.2.2
+selenium==3.141.0
+lxml==4.5.2

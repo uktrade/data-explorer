@@ -26,27 +26,9 @@
     white-space: nowrap;
 }
 .scrollable-table {
-    width: 100%;
+    /*width: 100%;*/
     overflow-x: auto;
     max-height: 560px;
-}
-.scrollable-table table thead th {
-    padding: 15px;
-    background-color: #dee0e2;
-    border-bottom: 0;
-    border-right: 2px solid #fff;
-    font-weight: normal;
-    min-width: 120px;
-    position: relative;
-    vertical-align: middle;
-}
-.scrollable-table table tbody td {
-    padding: 15px;
-    vertical-align: top;
-    border: none;
-}
-.scrollable-table table tbody tr:nth-child(even) td {
-    background-color: #f8f8f8;
 }
 /* add yellow box shadow to query editor on focus */
 .govuk-textarea:focus-within {
@@ -86,11 +68,6 @@
     word-break: break-word;
 }
 
-.schema-table {
-    background-color: white;
-    padding: 5px;
-}
-
 .schema-cell-left {
     font-size: 0.8rem;
     padding: 5px 5px 5px 5;
@@ -116,11 +93,10 @@
     color: #337ab7;
 }
 
-
 .app-label--inline, .app-input--inline {
     display: inline;
 }
 
-.app-pagination-controls {
-    float: right;
+#original-sql:read-only {
+    background-color: #F0F0F0
 }

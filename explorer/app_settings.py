@@ -35,13 +35,6 @@ CSV_DELIMETER = getattr(settings, "EXPLORER_CSV_DELIMETER", ",")
 # API access
 EXPLORER_TOKEN = getattr(settings, 'EXPLORER_TOKEN', 'CHANGEME')
 
-# These are callable to aid testability by dodging the settings cache.
-# There is surely a better pattern for this, but this'll hold for now.
-
-
-def get_explorer_user_query_views():
-    return getattr(settings, 'EXPLORER_USER_QUERY_VIEWS', {})
-
 
 # Async task related. Note that the EMAIL_HOST settings must be set up for email to work.
 ENABLE_TASKS = getattr(settings, "EXPLORER_TASKS_ENABLED", False)

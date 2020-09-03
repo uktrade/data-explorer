@@ -4,6 +4,7 @@ from django.conf import settings
 register = template.Library()
 
 HOME_MENU_ITEM = 'home'
+QUERY_LIST_ITEM = 'queries'
 LOGS_MENU_ITEM = 'logs'
 NEW_MENU_ITEM = 'new_query'
 PLAY_MENU_ITEM = 'playground'
@@ -18,13 +19,13 @@ def is_table_browser_enabled():
 @register.simple_tag(takes_context=True)
 def get_active_menu(context):
     view_name = context['request'].resolver_match.url_name
-    if view_name in ['explorer_index', 'query_detail']:
+    if view_name in ['explorer_index']:
         return HOME_MENU_ITEM
     if view_name == 'explorer_logs':
         return LOGS_MENU_ITEM
-    if view_name == 'explorer_playground':
-        return PLAY_MENU_ITEM
     if view_name == 'query_create':
         return NEW_MENU_ITEM
+    if view_name == 'list_queries':
+        return QUERY_LIST_ITEM
     if view_name in ['connection_browser_list', 'table_browser_list', 'table_browser_detail']:
         return TABLE_BROWSER_MENU_ITEM

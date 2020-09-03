@@ -18,7 +18,8 @@ class TestTasks(TestCase):
         self.assertEqual(QueryLog.objects.count(), 1)
 
     @patch('explorer.schema.build_schema_info')
-    def test_build_schema_cache_async(self, mocked_build):
+    @patch('explorer.schema.cache.set')
+    def test_build_schema_cache_async(self, _, mocked_build):
         mocked_build.return_value = ['list_of_tuples']
         schema = build_schema_cache_async(CONN)
         assert mocked_build.called

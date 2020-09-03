@@ -1,18 +1,15 @@
 import json
 import time
-from unittest.mock import patch
 
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.forms.models import model_to_dict
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 
 try:
     from django.urls import reverse
 except ImportError:
     from django.core.urlresolvers import reverse
 
-from explorer.app_settings import EXPLORER_CONNECTIONS
 from explorer.models import Query, QueryLog
 from explorer.tests.factories import QueryLogFactory, SimpleQueryFactory
 
@@ -27,7 +24,7 @@ class TestQueryListView(TestCase):
         SimpleQueryFactory(title='foo - bar2')
         SimpleQueryFactory(title='foo - bar3')
         SimpleQueryFactory(title='qux - mux')
-        resp = self.client.get(reverse("explorer_index"))
+        resp = self.client.get(reverse("list_queries"))
         self.assertContains(resp, 'foo (3)')
         self.assertContains(resp, 'foo - bar2')
         self.assertContains(resp, 'qux - mux')
@@ -36,7 +33,7 @@ class TestQueryListView(TestCase):
         q = SimpleQueryFactory(title='foo - bar1')
         for i in range(0, 4):
             q.log()
-        resp = self.client.get(reverse("explorer_index"))
+        resp = self.client.get(reverse("list_queries"))
         self.assertContains(resp, '4')
 
 
@@ -55,9 +52,12 @@ class TestQueryCreateView(TestCase):
         self.client.login(username='admin', password='pwd')
         query = SimpleQueryFactory.build(sql='SELECT 1;')
         data = model_to_dict(query)
+        data['action'] = "save"
         del data['id']
         del data['created_by_user']
+
         self.client.post(reverse("query_create"), data)
+
         self.assertEqual(Query.objects.all()[0].sql, 'SELECT 1;')
 
     def test_invalid_query(self):
@@ -68,6 +68,14 @@ class TestQueryCreateView(TestCase):
         del data['created_by_user']
         self.client.post(reverse("query_create"), data)
         self.assertEquals(len(Query.objects.all()), 0)
+
+    def test_renders_back_link(self):
+        self.client.login(username='admin', password='pwd')
+        response = self.client.get(reverse("query_create"), {"sql": "select 1, 2, 3"})
+        assert (
+            '<a href="/?sql=select+1%2C+2%2C+3" class="govuk-back-link">Back</a>'
+            in response.content.decode(response.charset)
+        )
 
 
 class TestQueryDetailView(TestCase):
@@ -80,7 +88,8 @@ class TestQueryDetailView(TestCase):
     def test_query_with_bad_sql_fails_on_save(self):
         query = SimpleQueryFactory(sql="select 1;")
         resp = self.client.post(
-            reverse("query_detail", kwargs={'query_id': query.id}), data={'sql': 'error'}
+            reverse("query_detail", kwargs={'query_id': query.id}),
+            data={'sql': 'error', "action": "save"},
         )
         self.assertTemplateUsed(resp, 'explorer/query.html')
         self.assertContains(resp, "Enter a SQL statement starting with SELECT or WITH")
@@ -90,6 +99,7 @@ class TestQueryDetailView(TestCase):
         query = SimpleQueryFactory(sql="select 1;")
         data = model_to_dict(query)
         data['sql'] = expected
+        data['action'] = 'save'
         self.client.post(reverse("query_detail", kwargs={'query_id': query.id}), data)
         self.assertEqual(Query.objects.get(pk=query.id).sql, expected)
 
@@ -117,50 +127,25 @@ class TestQueryDetailView(TestCase):
         self.assertTemplateUsed(resp, 'explorer/query.html')
         self.assertNotContains(resp, '6871')
 
-    def test_doesnt_render_results_if_show_is_none_on_post(self):
+    def test_doesnt_render_results_on_page(self):
         query = SimpleQueryFactory(sql='select 6870+1;')
         resp = self.client.post(
-            reverse("query_detail", kwargs={'query_id': query.id}) + '?show=0',
-            {'sql': 'select 6870+2;'},
+            reverse("query_detail", kwargs={'query_id': query.id}),
+            {'sql': 'select 6870+2;', 'action': 'save'},
         )
         self.assertTemplateUsed(resp, 'explorer/query.html')
         self.assertNotContains(resp, '6872')
 
-    def test_individual_view_permission(self):
-        self.client.logout()
-        user = User.objects.create_user('user1', 'user@user.com', 'pwd')
-        self.client.login(username='user1', password='pwd')
-
-        query = SimpleQueryFactory(sql="select 123+1")
-
-        with self.settings(EXPLORER_USER_QUERY_VIEWS={user.id: [query.id]}):
-            resp = self.client.get(reverse("query_detail", kwargs={'query_id': query.id}))
-        self.assertTemplateUsed(resp, 'explorer/query.html')
-        self.assertContains(resp, "124")
-
-    def test_multiple_connections_integration(self):
-        from explorer.app_settings import EXPLORER_CONNECTIONS
-        from explorer.connections import connections
-
-        c1_alias = EXPLORER_CONNECTIONS['SQLite']
-        conn = connections[c1_alias]
-        c = conn.cursor()
-        c.execute('CREATE TABLE IF NOT EXISTS animals (name text NOT NULL);')
-        c.execute('INSERT INTO animals ( name ) VALUES (\'peacock\')')
-
-        c2_alias = EXPLORER_CONNECTIONS['Another']
-        conn = connections[c2_alias]
-        c = conn.cursor()
-        c.execute('CREATE TABLE IF NOT EXISTS animals (name text NOT NULL);')
-        c.execute('INSERT INTO animals ( name ) VALUES (\'superchicken\')')
-
-        query = SimpleQueryFactory(sql="select name from animals;", connection=c1_alias)
-        resp = self.client.get(reverse("query_detail", kwargs={'query_id': query.id}))
-        self.assertContains(resp, "peacock")
-
-        query = SimpleQueryFactory(sql="select name from animals;", connection=c2_alias)
-        resp = self.client.get(reverse("query_detail", kwargs={'query_id': query.id}))
-        self.assertContains(resp, "superchicken")
+    def test_renders_back_link(self):
+        query = SimpleQueryFactory(sql='select 6870+1;')
+        self.client.login(username='admin', password='pwd')
+        response = self.client.get(
+            reverse("query_detail", kwargs={"query_id": query.id}), {"from": "play"}
+        )
+        assert (
+            f'<a href="/?sql=select+6870%2B1%3B&amp;query_id={query.id}" class="govuk-back-link">Back</a>'
+            in response.content.decode(response.charset)
+        )
 
 
 class TestDownloadView(TestCase):
@@ -171,9 +156,12 @@ class TestDownloadView(TestCase):
 
     def test_params_in_download(self):
         q = SimpleQueryFactory(sql="select '$$foo$$';")
-        url = '%s?params=%s' % (reverse("download_query", kwargs={'query_id': q.id}), 'foo:123')
+        url = '%s?params=%s' % (
+            reverse("download_query", kwargs={'query_id': q.id}),
+            'foo:1234567890',
+        )
         resp = self.client.get(url)
-        self.assertContains(resp, "'123'")
+        self.assertContains(resp, "1234567890")
 
     def test_download_defaults_to_csv(self):
         query = SimpleQueryFactory()
@@ -200,7 +188,7 @@ class TestDownloadView(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, f'/{query.pk}/')
+        self.assertEqual(response.url, f'/queries/{query.pk}/')
 
     def test_download_json(self):
         query = SimpleQueryFactory()
@@ -214,10 +202,12 @@ class TestDownloadView(TestCase):
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertIsInstance(json_data, list)
         self.assertEqual(len(json_data), 1)
-        self.assertEqual(json_data, [{'TWO': 2}])
+        self.assertEqual(json_data, [{'two': 2}])
 
 
-class TestQueryPlayground(TestCase):
+class TestQueryPlayground(TransactionTestCase):
+    databases = ['default', 'alt']
+
     def setUp(self):
         self.user = User.objects.create_superuser('admin', 'admin@admin.com', 'pwd')
         self.client.login(username='admin', password='pwd')
@@ -225,42 +215,82 @@ class TestQueryPlayground(TestCase):
     def test_empty_playground_renders(self):
         resp = self.client.get(reverse("explorer_playground"))
         self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'explorer/play.html')
+        self.assertTemplateUsed(resp, 'explorer/home.html')
 
     def test_playground_renders_with_query_sql(self):
         query = SimpleQueryFactory(sql="select 1;")
         resp = self.client.get('%s?query_id=%s' % (reverse("explorer_playground"), query.id))
-        self.assertTemplateUsed(resp, 'explorer/play.html')
+        self.assertTemplateUsed(resp, 'explorer/home.html')
         self.assertContains(resp, 'select 1;')
 
     def test_playground_renders_with_posted_sql(self):
         resp = self.client.post(
-            reverse("explorer_playground"), {'title': 'test', 'sql': 'select 1+3400;'}
+            reverse("explorer_playground"),
+            {'title': 'test', 'sql': 'select 1+3400;', "action": "run"},
         )
-        self.assertTemplateUsed(resp, 'explorer/play.html')
+        self.assertTemplateUsed(resp, 'explorer/home.html')
         self.assertContains(resp, '3401')
 
-    def test_playground_doesnt_render_with_posted_sql_if_show_is_none(self):
+    def test_playground_redirects_to_query_create_on_save_with_sql_query_param(self):
         resp = self.client.post(
-            reverse("explorer_playground") + '?show=0', {'sql': 'select 1+3400;'}
+            reverse("explorer_playground"), {'sql': 'select 1+3400;', "action": "save"}
         )
-        self.assertTemplateUsed(resp, 'explorer/play.html')
-        self.assertNotContains(resp, '3401')
+        self.assertEqual(resp.url, '/queries/create/?sql=select+1%2B3400%3B')
 
     def test_playground_renders_with_empty_posted_sql(self):
-        resp = self.client.post(reverse("explorer_playground"), {'sql': ''})
+        resp = self.client.post(reverse("explorer_playground"), {'sql': '', "action": "run"})
         self.assertEqual(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'explorer/play.html')
+        self.assertTemplateUsed(resp, 'explorer/home.html')
 
     def test_query_with_no_resultset_doesnt_throw_error(self):
         query = SimpleQueryFactory(sql="")
         resp = self.client.get('%s?query_id=%s' % (reverse("explorer_playground"), query.id))
-        self.assertTemplateUsed(resp, 'explorer/play.html')
+        self.assertTemplateUsed(resp, 'explorer/home.html')
 
     def test_loads_query_from_log(self):
         querylog = QueryLogFactory()
         resp = self.client.get('%s?querylog_id=%s' % (reverse("explorer_playground"), querylog.id))
         self.assertContains(resp, "FOUR")
+
+    def test_multiple_connections_integration(self):
+        from explorer.app_settings import EXPLORER_CONNECTIONS
+        from explorer.connections import connections
+
+        c1_alias = EXPLORER_CONNECTIONS['Postgres']
+        conn = connections[c1_alias]
+        c1 = conn.cursor()
+        c1.execute('CREATE TABLE IF NOT EXISTS animals (name text NOT NULL);')
+        c1.execute('INSERT INTO animals ( name ) VALUES (\'peacock\')')
+        c1.execute('COMMIT')
+
+        c2_alias = EXPLORER_CONNECTIONS['Alt']
+        conn = connections[c2_alias]
+        c2 = conn.cursor()
+        c2.execute('CREATE TABLE IF NOT EXISTS animals (name text NOT NULL);')
+        c2.execute('INSERT INTO animals ( name ) VALUES (\'superchicken\')')
+        c2.execute('COMMIT')
+
+        resp = self.client.post(
+            reverse("explorer_playground"),
+            {
+                "title": "Playground query",
+                "sql": "select name from animals;",
+                "connection": c1_alias,
+                "action": "run",
+            },
+        )
+        self.assertContains(resp, "peacock")
+
+        resp = self.client.post(
+            reverse("explorer_playground"),
+            {
+                "title": "Playground query",
+                "sql": "select name from animals;",
+                "connection": c2_alias,
+                "action": "run",
+            },
+        )
+        self.assertContains(resp, "superchicken")
 
 
 class TestCSVFromSQL(TestCase):
@@ -296,13 +326,13 @@ class TestSQLDownloadViews(TestCase):
         from explorer.app_settings import EXPLORER_CONNECTIONS
         from explorer.connections import connections
 
-        c1_alias = EXPLORER_CONNECTIONS['SQLite']
+        c1_alias = EXPLORER_CONNECTIONS['Postgres']
         conn = connections[c1_alias]
         c = conn.cursor()
         c.execute('CREATE TABLE IF NOT EXISTS animals (name text NOT NULL);')
         c.execute('INSERT INTO animals ( name ) VALUES (\'peacock\')')
 
-        c2_alias = EXPLORER_CONNECTIONS['Another']
+        c2_alias = EXPLORER_CONNECTIONS['Alt']
         conn = connections[c2_alias]
         c = conn.cursor()
         c.execute('CREATE TABLE IF NOT EXISTS animals (name text NOT NULL);')
@@ -322,7 +352,7 @@ class TestSQLDownloadViews(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['content-type'], 'text/csv')
-        self.assertEqual(response.content.decode('utf-8'), '1|2\r\n1|2\r\n')
+        self.assertEqual(response.content.decode('utf-8'), '?column?|?column?\r\n1|2\r\n')
 
     def test_sql_download_csv_with_tab_delim(self):
         url = reverse("download_sql") + '?format=csv&delim=tab'
@@ -331,7 +361,7 @@ class TestSQLDownloadViews(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['content-type'], 'text/csv')
-        self.assertEqual(response.content.decode('utf-8'), '1\t2\r\n1\t2\r\n')
+        self.assertEqual(response.content.decode('utf-8'), '?column?\t?column?\r\n1\t2\r\n')
 
     def test_sql_download_csv_with_bad_delim(self):
         url = reverse("download_sql") + '?format=csv&delim=foo'
@@ -340,7 +370,7 @@ class TestSQLDownloadViews(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['content-type'], 'text/csv')
-        self.assertEqual(response.content.decode('utf-8'), '1,2\r\n1,2\r\n')
+        self.assertEqual(response.content.decode('utf-8'), '?column?,?column?\r\n1,2\r\n')
 
     def test_sql_download_json(self):
         url = reverse("download_sql") + '?format=json'
@@ -349,37 +379,6 @@ class TestSQLDownloadViews(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['content-type'], 'application/json')
-
-
-class TestSchemaView(TestCase):
-    databases = ['default', 'postgres']
-
-    def setUp(self):
-        cache.clear()
-        self.user = User.objects.create_superuser('admin', 'admin@admin.com', 'pwd')
-        self.client.login(username='admin', password='pwd')
-
-    @patch('explorer.schema.do_async')
-    def test_returns_schema_contents(self, mocked_async_check):
-        mocked_async_check.return_value = False
-        resp = self.client.get(
-            reverse("explorer_schema", kwargs={'connection': EXPLORER_CONNECTIONS['Postgres']})
-        )
-        self.assertContains(resp, "explorer_query")
-        self.assertTemplateUsed(resp, 'explorer/schema.html')
-
-    def test_returns_404_if_conn_doesnt_exist(self):
-        resp = self.client.get(reverse("explorer_schema", kwargs={'connection': 'foo'}))
-        self.assertEqual(resp.status_code, 404)
-
-    @patch('explorer.schema.build_schema_cache_async')
-    @patch('explorer.schema.do_async')
-    def test_builds_async(self, mocked_async_check, mock_build_schema_cache_async):
-        mocked_async_check.return_value = True
-        resp = self.client.get(
-            reverse("explorer_schema", kwargs={'connection': EXPLORER_CONNECTIONS['Postgres']})
-        )
-        self.assertContains(resp, '{"schema": ""}')
 
 
 class TestFormat(TestCase):
@@ -402,22 +401,9 @@ class TestParamsInViews(TestCase):
 
     def test_retrieving_query_works_with_params(self):
         resp = self.client.get(
-            reverse("query_detail", kwargs={'query_id': self.query.id}) + '?params=swap:123}'
+            reverse("explorer_playground") + f"?query_id={self.query.id}&params=swap:1234567890"
         )
-        self.assertContains(resp, "123")
-
-    def test_saving_non_executing_query_with__wrong_url_params_fails(self):
-        q = SimpleQueryFactory(sql="select $$swap$$;")
-        data = model_to_dict(q)
-        url = '%s?params=%s' % (reverse("query_detail", kwargs={'query_id': q.id}), 'foo:123')
-        resp = self.client.post(url, data)
-        self.assertContains(resp, 'Query error')
-
-    def test_users_without_change_permissions_can_use_params(self):
-        resp = self.client.get(
-            reverse("query_detail", kwargs={'query_id': self.query.id}) + '?params=swap:123}'
-        )
-        self.assertContains(resp, "123")
+        self.assertContains(resp, "1234567890")
 
 
 class TestCreatedBy(TestCase):
@@ -425,6 +411,7 @@ class TestCreatedBy(TestCase):
         self.user = User.objects.create_superuser('admin', 'admin@admin.com', 'pwd')
         self.user2 = User.objects.create_superuser('admin2', 'admin2@admin.com', 'pwd')
         self.client.login(username='admin', password='pwd')
+
         self.query = SimpleQueryFactory.build(created_by_user=self.user)
         self.data = model_to_dict(self.query)
         del self.data['id']
@@ -433,13 +420,13 @@ class TestCreatedBy(TestCase):
     def test_query_update_doesnt_change_created_user(self):
         self.query.save()
         self.client.post(reverse("query_detail", kwargs={'query_id': self.query.id}), self.data)
-        q = Query.objects.get(id=self.query.id)
-        self.assertEqual(q.created_by_user_id, self.user.id)
+        query = Query.objects.get(id=self.query.id)
+        self.assertEqual(query.created_by_user_id, self.user.id)
 
     def test_new_query_gets_created_by_logged_in_user(self):
-        self.client.post(reverse("query_create"), self.data)
-        q = Query.objects.first()
-        self.assertEqual(q.created_by_user_id, self.user.id)
+        self.client.post(reverse("query_create"), {**self.data, "action": "save"})
+        query = Query.objects.first()
+        self.assertEqual(query.created_by_user_id, self.user.id)
 
 
 class TestQueryLog(TestCase):
@@ -448,7 +435,9 @@ class TestQueryLog(TestCase):
         self.client.login(username='admin', password='pwd')
 
     def test_playground_saves_query_to_log(self):
-        self.client.post(reverse("explorer_playground"), {'title': 'test', 'sql': 'select 1'})
+        self.client.post(
+            reverse("explorer_playground"), {'title': 'test', 'sql': 'select 1', "action": "run"}
+        )
         log = QueryLog.objects.first()
         self.assertTrue(log.is_playground)
         self.assertEqual(log.sql, 'select 1')
@@ -463,14 +452,16 @@ class TestQueryLog(TestCase):
         query = SimpleQueryFactory()
         data = model_to_dict(query)
         data['sql'] = 'select 12345;'
-        self.client.post(reverse("query_detail", kwargs={'query_id': query.id}), data)
+        data['action'] = 'run'
+        self.client.post(reverse("explorer_playground") + f"?query_id={query.id}", data)
         self.assertEqual(1, QueryLog.objects.count())
 
     def test_query_gets_logged_and_appears_on_log_page(self):
         query = SimpleQueryFactory()
         data = model_to_dict(query)
         data['sql'] = 'select 12345;'
-        self.client.post(reverse("query_detail", kwargs={'query_id': query.id}), data)
+        data['action'] = 'run'
+        self.client.post(reverse("explorer_playground") + f"?query_id={query.id}", data)
         resp = self.client.get(reverse("explorer_logs"))
         self.assertContains(resp, 'select 12345;')
 

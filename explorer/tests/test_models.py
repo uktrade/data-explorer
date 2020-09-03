@@ -68,7 +68,8 @@ class TestQueryModel(TestCase):
         q = SimpleQueryFactory()
         res, ql = q.execute_with_logging(None, None, 10, 10000)
         log = QueryLog.objects.first()
-        self.assertEqual(log.duration, res.duration)
+
+        self.assertAlmostEquals(log.duration, res.duration, places=9)
 
     def test_final_sql_uses_merged_params(self):
         q = SimpleQueryFactory(sql="select '$$foo:bar$$', '$$qux$$';")
@@ -85,7 +86,7 @@ class TestQueryModel(TestCase):
 
 class _AbstractQueryResults:
     connection_name = CONN
-    query = 'select 1 as "foo", "qux" as "mux";'
+    query = "select 1 as foo, 'qux' as mux;"
 
     def setUp(self):
         conn = connections[self.connection_name]
@@ -135,12 +136,6 @@ class _AbstractQueryResults:
 class TestQueryResults(_AbstractQueryResults, TestCase):
     databases = ['default']
     connection_name = CONN
-
-
-class TestPostgresQueryResults(_AbstractQueryResults, TestCase):
-    databases = ['postgres']
-    connection_name = 'postgres'
-    query = "select 1 as foo, 'qux' as mux"
 
 
 class TestColumnSummary(TestCase):

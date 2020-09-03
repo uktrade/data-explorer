@@ -8,8 +8,6 @@ from explorer.app_settings import EXPLORER_CONNECTIONS
 
 
 class TestSchemaInfo(TestCase):
-    databases = ['postgres']
-
     def setUp(self):
         cache.clear()
 
