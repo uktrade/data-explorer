@@ -308,6 +308,7 @@ if not MULTIUSER_DEPLOYMENT:
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'unique-snowflake',
+            'TIMEOUT': None,  # never expire
         }
     }
 
@@ -323,9 +324,10 @@ else:
     # Cache
     CACHES = {
         'default': {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": env.str('REDIS_URL', ''),
-            "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': env.str('REDIS_URL', ''),
+            'OPTIONS': {'CLIENT_CLASS': 'django_redis.client.DefaultClient'},
+            'TIMEOUT': 600,  # 10 min
         }
     }
 
