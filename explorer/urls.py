@@ -5,18 +5,14 @@ from django.urls import include, path
 
 from explorer.tasks import build_schema_cache_async
 from explorer.views import (
-    ConnectionBrowserListView,
     CreateQueryView,
     DeleteQueryView,
     DownloadFromSqlView,
     DownloadQueryView,
-    format_sql,
     ListQueryLogView,
     ListQueryView,
     PlayQueryView,
     QueryView,
-    TableBrowserDetailView,
-    TableBrowserListView,
 )
 
 urlpatterns = [
@@ -28,16 +24,7 @@ urlpatterns = [
     path('queries/<int:query_id>/', QueryView.as_view(), name='query_detail'),
     path('queries/<int:query_id>/download/', DownloadQueryView.as_view(), name='download_query'),
     path('queries/<int:pk>/delete/', DeleteQueryView.as_view(), name='query_delete'),
-    path('play/', PlayQueryView.as_view(), name='explorer_playground'),
     path('logs/', ListQueryLogView.as_view(), name='explorer_logs'),
-    path('format/', format_sql, name='format_sql'),
-    path('browse/', ConnectionBrowserListView.as_view(), name='connection_browser_list'),
-    path('browse/<slug:connection>/', TableBrowserListView.as_view(), name='table_browser_list'),
-    path(
-        'browse/<slug:connection>/<slug:schema>/<slug:table>/',
-        TableBrowserDetailView.as_view(),
-        name='table_browser_detail',
-    ),
 ]
 
 if settings.DEBUG:

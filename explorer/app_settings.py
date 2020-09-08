@@ -39,5 +39,3 @@ EXPLORER_TOKEN = getattr(settings, 'EXPLORER_TOKEN', 'CHANGEME')
 # Async task related. Note that the EMAIL_HOST settings must be set up for email to work.
 ENABLE_TASKS = getattr(settings, "EXPLORER_TASKS_ENABLED", False)
 UNSAFE_RENDERING = getattr(settings, "EXPLORER_UNSAFE_RENDERING", False)
-
-TABLE_BROWSER_LIMIT = getattr(settings, "EXPLORER_TABLE_BROWSER_LIMIT", 20)

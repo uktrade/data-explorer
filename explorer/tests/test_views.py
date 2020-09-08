@@ -205,7 +205,7 @@ class TestDownloadView(TestCase):
         self.assertEqual(json_data, [{'two': 2}])
 
 
-class TestQueryPlayground(TransactionTestCase):
+class TestHomePage(TransactionTestCase):
     databases = ['default', 'alt']
 
     def setUp(self):
@@ -213,43 +213,42 @@ class TestQueryPlayground(TransactionTestCase):
         self.client.login(username='admin', password='pwd')
 
     def test_empty_playground_renders(self):
-        resp = self.client.get(reverse("explorer_playground"))
+        resp = self.client.get(reverse("explorer_index"))
         self.assertEqual(resp.status_code, 200)
         self.assertTemplateUsed(resp, 'explorer/home.html')
 
     def test_playground_renders_with_query_sql(self):
         query = SimpleQueryFactory(sql="select 1;")
-        resp = self.client.get('%s?query_id=%s' % (reverse("explorer_playground"), query.id))
+        resp = self.client.get('%s?query_id=%s' % (reverse("explorer_index"), query.id))
         self.assertTemplateUsed(resp, 'explorer/home.html')
         self.assertContains(resp, 'select 1;')
 
     def test_playground_renders_with_posted_sql(self):
         resp = self.client.post(
-            reverse("explorer_playground"),
-            {'title': 'test', 'sql': 'select 1+3400;', "action": "run"},
+            reverse("explorer_index"), {'title': 'test', 'sql': 'select 1+3400;', "action": "run"},
         )
         self.assertTemplateUsed(resp, 'explorer/home.html')
         self.assertContains(resp, '3401')
 
     def test_playground_redirects_to_query_create_on_save_with_sql_query_param(self):
         resp = self.client.post(
-            reverse("explorer_playground"), {'sql': 'select 1+3400;', "action": "save"}
+            reverse("explorer_index"), {'sql': 'select 1+3400;', "action": "save"}
         )
         self.assertEqual(resp.url, '/queries/create/?sql=select+1%2B3400%3B')
 
     def test_playground_renders_with_empty_posted_sql(self):
-        resp = self.client.post(reverse("explorer_playground"), {'sql': '', "action": "run"})
+        resp = self.client.post(reverse("explorer_index"), {'sql': '', "action": "run"})
         self.assertEqual(resp.status_code, 200)
         self.assertTemplateUsed(resp, 'explorer/home.html')
 
     def test_query_with_no_resultset_doesnt_throw_error(self):
         query = SimpleQueryFactory(sql="")
-        resp = self.client.get('%s?query_id=%s' % (reverse("explorer_playground"), query.id))
+        resp = self.client.get('%s?query_id=%s' % (reverse("explorer_index"), query.id))
         self.assertTemplateUsed(resp, 'explorer/home.html')
 
     def test_loads_query_from_log(self):
         querylog = QueryLogFactory()
-        resp = self.client.get('%s?querylog_id=%s' % (reverse("explorer_playground"), querylog.id))
+        resp = self.client.get('%s?querylog_id=%s' % (reverse("explorer_index"), querylog.id))
         self.assertContains(resp, "FOUR")
 
     def test_multiple_connections_integration(self):
@@ -271,7 +270,7 @@ class TestQueryPlayground(TransactionTestCase):
         c2.execute('COMMIT')
 
         resp = self.client.post(
-            reverse("explorer_playground"),
+            reverse("explorer_index"),
             {
                 "title": "Playground query",
                 "sql": "select name from animals;",
@@ -282,7 +281,7 @@ class TestQueryPlayground(TransactionTestCase):
         self.assertContains(resp, "peacock")
 
         resp = self.client.post(
-            reverse("explorer_playground"),
+            reverse("explorer_index"),
             {
                 "title": "Playground query",
                 "sql": "select name from animals;",
@@ -381,18 +380,6 @@ class TestSQLDownloadViews(TestCase):
         self.assertEqual(response['content-type'], 'application/json')
 
 
-class TestFormat(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_superuser('admin', 'admin@admin.com', 'pwd')
-        self.client.login(username='admin', password='pwd')
-
-    def test_returns_formatted_sql(self):
-        resp = self.client.post(reverse("format_sql"), data={"sql": "select * from explorer_query"})
-        resp = json.loads(resp.content.decode('utf-8'))
-        self.assertIn("\n", resp['formatted'])
-        self.assertIn("explorer_query", resp['formatted'])
-
-
 class TestParamsInViews(TestCase):
     def setUp(self):
         self.user = User.objects.create_superuser('admin', 'admin@admin.com', 'pwd')
@@ -401,7 +388,7 @@ class TestParamsInViews(TestCase):
 
     def test_retrieving_query_works_with_params(self):
         resp = self.client.get(
-            reverse("explorer_playground") + f"?query_id={self.query.id}&params=swap:1234567890"
+            reverse("explorer_index") + f"?query_id={self.query.id}&params=swap:1234567890"
         )
         self.assertContains(resp, "1234567890")
 
@@ -436,7 +423,7 @@ class TestQueryLog(TestCase):
 
     def test_playground_saves_query_to_log(self):
         self.client.post(
-            reverse("explorer_playground"), {'title': 'test', 'sql': 'select 1', "action": "run"}
+            reverse("explorer_index"), {'title': 'test', 'sql': 'select 1', "action": "run"}
         )
         log = QueryLog.objects.first()
         self.assertTrue(log.is_playground)
@@ -453,7 +440,7 @@ class TestQueryLog(TestCase):
         data = model_to_dict(query)
         data['sql'] = 'select 12345;'
         data['action'] = 'run'
-        self.client.post(reverse("explorer_playground") + f"?query_id={query.id}", data)
+        self.client.post(reverse("explorer_index") + f"?query_id={query.id}", data)
         self.assertEqual(1, QueryLog.objects.count())
 
     def test_query_gets_logged_and_appears_on_log_page(self):
@@ -461,7 +448,7 @@ class TestQueryLog(TestCase):
         data = model_to_dict(query)
         data['sql'] = 'select 12345;'
         data['action'] = 'run'
-        self.client.post(reverse("explorer_playground") + f"?query_id={query.id}", data)
+        self.client.post(reverse("explorer_index") + f"?query_id={query.id}", data)
         resp = self.client.get(reverse("explorer_logs"))
         self.assertContains(resp, 'select 12345;')
 
