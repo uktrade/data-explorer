@@ -167,7 +167,12 @@
         {% block javascript %}
             {% block footer_additions %} {% endblock footer_additions %}
             <script src="{% static 'js/all.js' %}"></script>
-            <script>window.GOVUKFrontend.initAll()</script>
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                window.GOVUKFrontend.initAll();
+              });
+            </script>
+          }
         {% endblock %}
 
         {% load render_bundle from webpack_loader %}
