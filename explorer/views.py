@@ -1,34 +1,28 @@
-import json
 import re
 from collections import Counter
+from urllib.parse import urlencode
 
 import six
+from django.conf import settings
 from django.contrib.auth.views import LoginView
-from django.core import serializers
-from django.core.exceptions import FieldDoesNotExist
-from django.core.paginator import Paginator
 from django.db import DatabaseError
 from django.db.models import Count
 from django.forms.models import model_to_dict
-from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
-from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
-from django.views.decorators.clickjacking import xframe_options_sameorigin
-from django.views.decorators.http import require_POST
+from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView
-from django.views.generic.base import TemplateView, View
+from django.views.generic.base import View
 from django.views.generic.edit import CreateView, DeleteView
 
 from explorer import app_settings
 from explorer.connections import connections
 from explorer.exporters import get_exporter_class
 from explorer.forms import QueryForm
-from explorer.models import FieldSchema, ModelSchema, Query, QueryLog
+from explorer.models import Query, QueryLog
 from explorer.schema import schema_info
 from explorer.utils import (
-    fmt_sql,
     get_total_pages,
     url_get_log_id,
     url_get_page,
@@ -74,6 +68,14 @@ class DownloadQueryView(View):
 
 
 class DownloadFromSqlView(View):
+    def get(self, request, *args, **kwargs):
+        sql = request.GET.get('sql')
+        connection = request.GET.get('connection')
+        query = Query(sql=sql, connection=connection, title='')
+        ql = query.log(request.user)
+        query.title = 'Playground - %s' % ql.id
+        return _export(request, query)
+
     def post(self, request, *args, **kwargs):
         sql = request.POST.get('sql')
         connection = request.POST.get('connection')
@@ -83,36 +85,11 @@ class DownloadFromSqlView(View):
         return _export(request, query)
 
 
-class SchemaPaneView(View):
-    @method_decorator(xframe_options_sameorigin)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        connection = kwargs.get('connection')
-        context = {'connection': connection, 'schema': _get_schema_html(connection)}
-        return render(None, 'explorer/schema_pane.html', context)
-
-
-class SchemaView(View):
-    def get(self, request, *args, **kwargs):
-        connection = kwargs.get('connection')
-        schema_html = _get_schema_html(connection)
-        return HttpResponse(json.dumps({'schema': schema_html}), content_type='application/json')
-
-
 def _get_schema_html(connection):
     if connection not in connections:
         raise Http404
     schema = schema_info(connection)
     return render_to_string('explorer/schema.html', {'schema': schema}) if schema else ""
-
-
-@require_POST
-def format_sql(request):
-    sql = request.POST.get('sql', '')
-    formatted = fmt_sql(sql)
-    return JsonResponse({"formatted": formatted})
 
 
 class ListQueryView(ListView):
@@ -224,26 +201,63 @@ class CreateQueryView(CreateView):
         form.instance.created_by_user = self.request.user
         return super().form_valid(form)
 
-    def post(self, request):
-        ret = super().post(request)
-        if self.get_form().is_valid():
-            show = url_get_show(request)
-            query, form = QueryView.get_instance_and_form(request, self.object.id)
-            success = form.is_valid() and form.save()
-            vm = query_viewmodel(
-                request.user,
-                query,
-                form=form,
-                run_query=show,
-                rows=url_get_rows(request),
-                page=url_get_page(request),
-                message="Query created." if success else None,
-                log=False,
-            )
-            if vm['form'].errors:
-                self.object.delete()
-            return render(self.request, 'explorer/query.html', vm)
-        return ret
+    def get_initial(self):
+        data = super().get_initial()
+
+        sql = self.request.GET.get("sql")
+        if sql:
+            data['sql'] = sql
+
+        return data
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+
+        sql = self.request.GET.get("sql")
+        if sql:
+            response.context_data['disable_sql'] = True
+
+        query_params = (('sql', request.GET.get('sql')),)
+        response.context_data['backlink'] = (
+            reverse("explorer_index") + f"?{urlencode(query_params)}"
+        )
+
+        return response
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get('action', '')
+
+        if action == 'save':
+            ret = super().post(request)
+            if self.get_form().is_valid():
+                show = url_get_show(request)
+                query, form = QueryView.get_instance_and_form(request, self.object.id)
+                success = form.is_valid() and form.save()
+                vm = query_viewmodel(
+                    request.user,
+                    query,
+                    form=form,
+                    run_query=show,
+                    rows=url_get_rows(request),
+                    page=url_get_page(request),
+                    message="Query created." if success else None,
+                    log=False,
+                )
+                if vm['form'].errors:
+                    self.object.delete()
+
+                return HttpResponseRedirect(
+                    reverse_lazy('query_detail', kwargs={'query_id': self.object.id})
+                )
+
+            return ret
+
+        elif action == 'edit':
+            query_params = (('sql', request.POST.get('sql')),)
+            return HttpResponseRedirect(reverse('explorer_index') + f"?{urlencode(query_params)}")
+
+        else:
+            return HttpResponse(f"Unknown form action: {action}", 400)
 
     form_class = QueryForm
     template_name = 'explorer/query.html'
@@ -252,7 +266,7 @@ class CreateQueryView(CreateView):
 class DeleteQueryView(DeleteView):
 
     model = Query
-    success_url = reverse_lazy("explorer_index")
+    success_url = reverse_lazy("list_queries")
 
 
 class PlayQueryView(View):
@@ -267,61 +281,131 @@ class PlayQueryView(View):
             return self.render_with_sql(request, query)
 
         return render(
-            self.request, 'explorer/play.html', {'title': 'Playground', 'form': QueryForm()}
+            self.request,
+            'explorer/home.html',
+            {
+                'title': 'Playground',
+                'form': QueryForm(initial={"sql": request.GET.get('sql')}),
+                'form_action': self.get_form_action(request),
+                'schema': schema_info(connection_alias=settings.EXPLORER_DEFAULT_CONNECTION),
+            },
         )
 
     def post(self, request):
         sql = request.POST.get('sql')
-        show = url_get_show(request)
-        query = Query(sql=sql, title="Playground", connection=request.POST.get('connection'))
-        run_query = True if show else False
-        return self.render_with_sql(request, query, run_query=run_query)
+        action = request.POST.get('action', '')
+        existing_query_id = url_get_query_id(request)
 
-    def render_with_sql(self, request, query, run_query=True):
+        if action.startswith("download"):
+            download_format = action.split('-')[1]
+            query_params = (('sql', sql), ('format', download_format))
+            return HttpResponseRedirect(reverse('download_sql') + f"?{urlencode(query_params)}")
+
+        if existing_query_id:
+            query = get_object_or_404(Query, pk=existing_query_id)
+        else:
+            query = Query(sql=sql, title="Playground", connection=request.POST.get('connection'))
+
+        if action == 'save':
+            if existing_query_id:
+                query_params = (("sql", sql), ('from', 'play'))
+
+                return redirect(
+                    reverse('query_detail', kwargs={"query_id": existing_query_id})
+                    + f"?{urlencode(query_params)}"
+                )
+
+            query_params = (('sql', sql),)
+            return redirect(reverse('query_create') + f"?{urlencode(query_params)}")
+
+        elif action == 'run' or action == 'fetch-page':
+            query.params = url_get_params(request)
+            response = self.render_with_sql(request, query, run_query=True, log=True)
+
+            return response
+
+        else:
+            return HttpResponse(f"Unknown form action: {action}", 400)
+
+    def get_form_action(self, request):
+        form_action_params = urlencode(
+            tuple((k, v) for k, v in request.GET.items() if k not in {'sql', 'querylog_id'})
+        )
+
+        form_action = request.path
+        if form_action_params:
+            form_action += "?" + form_action_params
+
+        return form_action
+
+    def render_with_sql(self, request, query, run_query=True, log=False):
         rows = url_get_rows(request)
         page = url_get_page(request)
-        form = QueryForm(request.POST if len(request.POST) else None, instance=query)
-        return render(
-            self.request,
-            'explorer/play.html',
-            query_viewmodel(
-                request.user,
-                query,
-                title="Playground",
-                run_query=run_query and form.is_valid(),
-                rows=rows,
-                page=page,
-                form=form,
-            ),
+        form = QueryForm(request.POST if request.method == 'POST' else None, instance=query)
+
+        # If there's custom SQL in URL params, override anything from the query. This may happen if someone is editing
+        # a query, goes to save it, then clicks the backlink. We need to preserve their edited SQL rather than just
+        # loading the old saved query SQL, and we do that by passing the new SQL through as a query param.
+        if request.method == 'GET' and request.GET.get('sql'):
+            form.initial['sql'] = request.GET.get('sql')
+
+        context = query_viewmodel(
+            request.user,
+            query,
+            title="Home",
+            run_query=run_query and form.is_valid(),
+            rows=rows,
+            page=page,
+            form=form,
+            log=log,
         )
+        context['schema'] = schema_info(connection_alias=settings.EXPLORER_DEFAULT_CONNECTION)
+        context['form_action'] = self.get_form_action(request)
+        return render(self.request, 'explorer/home.html', context)
 
 
 class QueryView(View):
     def get(self, request, query_id):
         query, form = QueryView.get_instance_and_form(request, query_id)
         query.save()  # updates the modified date
-        show = url_get_show(request)
-        rows = url_get_rows(request)
-        page = url_get_page(request)
-        vm = query_viewmodel(
-            request.user, query, form=form, run_query=show, rows=rows, page=page, method="GET"
-        )
-        return render(self.request, 'explorer/query.html', vm)
+
+        # Overwrite SQL form field from GET query parameter (sent when saving an existing query from the playground).
+        sql = request.GET.get("sql")
+        if sql:
+            form.initial['sql'] = sql
+
+        context = {'form': form, 'query': query}
+        if request.GET.get("from") == "play":
+            query_params = (('sql', form.initial['sql']), ('query_id', query.id))
+            context['backlink'] = reverse("explorer_index") + f"?{urlencode(query_params)}"
+
+        return render(self.request, 'explorer/query.html', context)
 
     def post(self, request, query_id):
-        show = url_get_show(request)
-        query, form = QueryView.get_instance_and_form(request, query_id)
-        success = form.is_valid() and form.save()
-        vm = query_viewmodel(
-            request.user,
-            query,
-            form=form,
-            run_query=show,
-            rows=url_get_rows(request),
-            page=url_get_page(request),
-            message="Query saved." if success else None,
-        )
-        return render(self.request, 'explorer/query.html', vm)
+        action = request.POST.get("action", "")
+
+        if action == 'save':
+            show = url_get_show(request)
+            query, form = QueryView.get_instance_and_form(request, query_id)
+            success = form.is_valid() and form.save()
+            vm = query_viewmodel(
+                request.user,
+                query,
+                form=form,
+                run_query=show,
+                rows=url_get_rows(request),
+                page=url_get_page(request),
+                message="Query saved." if success else None,
+            )
+            return render(self.request, 'explorer/query.html', vm)
+
+        elif action == 'edit':
+            query, form = QueryView.get_instance_and_form(request, query_id)
+            query_params = (('query_id', query.id), ('sql', request.POST.get('sql')))
+            return HttpResponseRedirect(reverse('explorer_index') + f"?{urlencode(query_params)}")
+
+        else:
+            return HttpResponse(f"Unknown form action: {action}", 400)
 
     @staticmethod
     def get_instance_and_form(request, query_id):
@@ -377,121 +461,5 @@ def query_viewmodel(
         'unsafe_rendering': app_settings.UNSAFE_RENDERING,
     }
     ret['total_pages'] = get_total_pages(ret['total_rows'], rows)
+
     return ret
-
-
-class ConnectionBrowserListView(TemplateView):
-
-    template_name = "browser/connection_list.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['connections'] = app_settings.EXPLORER_CONNECTIONS
-        return context
-
-
-class TableBrowserListView(TemplateView):
-
-    template_name = "browser/table_list.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        connection = self.kwargs['connection']
-        context['tables'] = schema_info(connection)
-        context['connection'] = connection
-        return context
-
-
-class TableBrowserDetailView(ListView):
-
-    template_name = "browser/table.html"
-    COLUMN_MAPPING = {
-        'CharField': 'character',
-        'TextField': 'text',
-        'IntegerField': 'integer',
-        'FloatField': 'float',
-        'BooleanField': 'boolean',
-        'DateField': 'date',
-        'TimestampField': 'date',
-    }
-    MAXIMUM_FILTER_VALUES = 100
-
-    def get_model(self):
-        schema = self.kwargs['schema']
-        table = self.kwargs['table']
-
-        columns = schema_info(self.kwargs['connection'], schema, table)
-        table_name = f'"{schema}"."{table}"'
-
-        try:
-            model = ModelSchema.objects.get(name=table_name)
-        except ModelSchema.DoesNotExist:
-            model = ModelSchema.objects.create(name=table_name)
-
-        for column in columns:
-            # Django automatically adds a field called id to all models if a primary key isn't
-            # specified so we need to skip adding this to the dynamic model
-            if column.name == 'id':
-                continue
-            try:
-                field = FieldSchema.objects.get(name=column.name)
-            except FieldSchema.DoesNotExist:
-                field = FieldSchema.objects.create(
-                    name=column.name, data_type=self.COLUMN_MAPPING[column.type]
-                )
-
-            try:
-                model.add_field(field)
-            except Exception:
-                pass
-
-        Model = model.as_model()
-        Model.objects = Model.objects.using(self.kwargs['connection'])
-        Model._meta.db_table = table_name
-
-        return Model
-
-    def get_queryset(self):
-        if not self.model:
-            self.model = self.get_model()
-        filters = {}
-        for filter_field, filter_value in self.request.GET.items():
-            if not filter_value:
-                continue
-            try:
-                field = self.model._meta.get_field(filter_field)
-            except FieldDoesNotExist:
-                continue
-            else:
-                filters[filter_field] = field.to_python(filter_value)
-
-        queryset = self.model.objects.filter(**filters)
-        order_by = self.request.GET.get('order_by')
-        if order_by:
-            return queryset.order_by(order_by)
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        queryset = self.get_queryset()
-        paginator = Paginator(
-            serializers.serialize('python', queryset), app_settings.TABLE_BROWSER_LIMIT
-        )
-        page_number = self.request.GET.get('page')
-        fields = [f for f in self.model._meta.get_fields() if f.name != 'id']
-
-        ctx['schema_name'] = self.kwargs['schema']
-        ctx['table_name'] = self.kwargs['table']
-        # Sets a tuple of (field name, sorted distinct values) for all fields to allow filtering
-        ctx['fields'] = [
-            (
-                f.name,
-                sorted([str(x) for x in queryset.values_list(f.name, flat=True).distinct()])[
-                    : self.MAXIMUM_FILTER_VALUES
-                ],
-            )
-            for f in fields
-        ]
-        ctx['connection'] = self.kwargs['connection']
-        ctx['objects'] = paginator.get_page(page_number)
-        return ctx

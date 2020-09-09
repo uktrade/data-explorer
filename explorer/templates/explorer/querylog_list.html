@@ -26,7 +26,7 @@
             {% elif object.is_playground %}Playground{% else %}--{% endif %}
         </td>
         <td class="govuk-table__cell">
-            <a class="govuk-link" href="{% url 'explorer_playground' %}?querylog_id={{ object.id }}">Open</a>
+            <a class="govuk-link" href="{% url 'explorer_index' %}?querylog_id={{ object.id }}">Open</a>
         </td>
     </tr>
     {% endfor %}

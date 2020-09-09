@@ -1,0 +1,7 @@
+.pytest_cache
+_static
+__pycache__
+static
+assets
+Dockerfile
+node_modules

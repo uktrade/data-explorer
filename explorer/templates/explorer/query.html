@@ -4,12 +4,10 @@
 
 {% block title %}{% if form.errors %}Error: {% endif%}Data Explorer - New query{% endblock %}
 
-{% block sql_explorer_navlinks %}
-    <li{% if not query %} class="active" {% endif %}><a href="{% url 'query_create' %}">New Query</a></li>
-    <li><a href="{% url 'explorer_playground' %}">Playground</a></li>
-    {% if query %}<li class="active"><a href="">Query Detail</a></li>{% endif %}
-        <li><a href="{% url 'explorer_logs' %}">Logs</a></li>
-        <li><a href="{% url 'connection_browser_list' %}">Table browser</a></li>
+{% block back_button %}
+  {% if backlink %}
+    <a href="{{ backlink }}" class="govuk-back-link">Back</a>
+  {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -97,10 +95,12 @@
                     <textarea class="govuk-textarea" id="id_description" name="description" cols="40" rows="2">{{ form.description.value|default_if_none:"" }}</textarea>
                 </div>
                 <input type="hidden" id="id_created_by_user" name="created_by_user" value="{{ form.created_by_user_email }}" />
-                <div class="govuk-form-group {% if form.sql.errors %} govuk-form-group--error {% endif %}">
-                    <p class="govuk-label" for="playground-sql">
+
+                {# We apply `id_sql` to the form group here to match the structure in `home.html` #}
+                <div id="id_sql" class="govuk-form-group {% if form.sql.errors %} govuk-form-group--error {% endif %}">
+                    <label class="govuk-label" for="original-sql">
                         SQL
-                    </p>
+                    </label>
                     {% if form.sql.errors %}
                         {% for error in form.sql.errors %}
                             <span id="sql-error" class="govuk-error-message">
@@ -108,40 +108,26 @@
                             </span>
                         {% endfor %}
                     {% endif %}
-                    <div class="govuk-textarea" id="gov-uk-sql-wrapper" rows="10">
-                        <div id="ace-sql-editor">{% if form.sql.value %}{{ form.sql.value }}{% endif %}</div>
+
+                    {# We include the ACE editor here, but hidden, in order to use ACE's formatting.  #}
+                    <div class="govuk-textarea" id="gov-uk-sql-wrapper" style="display: none;">
+                        <div id="ace-sql-editor" data-disabled="true">{% if form.sql.value %}{{ form.sql.value }}{% endif %}</div>
                     </div>
-                    <textarea aria-label="Sql" style="display: none;" name="sql">{% if form.sql.value %}{{ form.sql.value }}{% endif %}</textarea>
+                    <textarea class="govuk-textarea" aria-label="Sql" name="sql" id="original-sql" rows="15" readonly>{% if form.sql.value %}{{ form.sql.value }}{% endif %}</textarea>
                 </div>
 
                 <div class="govuk-form-group">
-                    <button class="govuk-button" data-module="govuk-button" id="save_button">
-                        Save & Run
+                    <button class="govuk-button" data-module="govuk-button" name="action" value="save">
+                        Save
                     </button>
-                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" id="save_only">
-                        Save only
+                    <button class="govuk-button govuk-button--secondary govuk-!-margin-left-4" data-module="govuk-button" type="button" id="format_button">
+                        Format SQL
                     </button>
-                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" id="download_csv">
-                        Download CSV
+                    <button class="govuk-button govuk-button--secondary govuk-!-margin-left-4" data-module="govuk-button" type="button" id="unformat_button">
+                        Reset format
                     </button>
-                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" id="download_excel">
-                        Download Excel
-                    </button>
-
-                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" id="download_json">
-                        Download JSON
-                    </button>
-
-                    <button
-                        class="govuk-button govuk-button--secondary"
-                        data-module="govuk-button"
-                        id="show_schema_button"
-                        type="button">
-                        Show Schema
-                    </button>
-
-                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="button" id="format_button">
-                        Format
+                    <button class="govuk-button govuk-button--secondary govuk-!-margin-left-4" data-module="govuk-button" name="action" value="edit">
+                        Edit SQL
                     </button>
 
                 </div>
@@ -154,8 +140,6 @@
         </div>
     </div>
 </div>
-
-{% include 'explorer/preview_pane.html' %}
 
 {% load render_bundle from webpack_loader %}
 {% render_bundle 'query' %}

@@ -24,7 +24,6 @@ job_defaults: &job_defaults
 
   docker:
     - image: <<parameters.python_image>>
-
     - image: <<parameters.postgres_image>>
 
   steps:
@@ -68,8 +67,27 @@ job_defaults: &job_defaults
 
 
 jobs:
-  build:
+  build_and_test:
     <<: *job_defaults
+
+  run_functional_tests:
+    parameters:
+      python_image:
+        type: string
+
+    working_directory: ~/app
+
+    docker:
+      - image: <<parameters.python_image>>
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Run functional tests
+          command: |
+            set -x
+            docker-compose -f docker-compose-test.yml -p data-explorer-test run explorer pytest explorer/tests/functional
 
 workflows:
   version: 2
@@ -77,6 +95,9 @@ workflows:
   # Current standard environment
   Default build:
     jobs:
-      - build:
+      - build_and_test:
           python_image: python:3.7.4
           postgres_image: postgres:10.5
+
+      - run_functional_tests:
+          python_image: cimg/python:3.7

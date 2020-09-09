@@ -79,7 +79,7 @@
             {% endif %}
           </td>
           <td class="govuk-table__cell">
-            <a class="govuk-link" href="{% url 'explorer_playground' %}?query_id={{ object.id }}">Play</a>
+            <a class="govuk-link" href="{% url 'explorer_index' %}?query_id={{ object.id }}">Play</a>
           </td>
           <td class="govuk-table__cell">
             <a class="govuk-link" href="{% url 'query_delete' object.id %}">Delete</a>

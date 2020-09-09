@@ -32,6 +32,7 @@ from explorer.app_settings import (
 from explorer.tasks import build_schema_cache_async
 from explorer.utils import get_valid_connection
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -126,6 +127,7 @@ def build_schema_info(connection_alias, schema=None, table=None):
         f'@{connection.settings_dict["HOST"]}:{connection.settings_dict["PORT"]}/'
         f'{connection.settings_dict["NAME"]}'
     )
+
     insp = Inspector.from_engine(engine)
     if schema and table:
         return _get_columns_for_table(insp, schema, table)

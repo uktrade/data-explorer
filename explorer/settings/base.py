@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import os
 
+
 import dj_database_url
 import environ
 import sentry_sdk
@@ -267,7 +268,6 @@ AUTHBROKER_URL = env.str('AUTHBROKER_URL', '')
 AUTHBROKER_CLIENT_ID = env.str('AUTHBROKER_CLIENT_ID', '')
 AUTHBROKER_CLIENT_SECRET = env.str('AUTHBROKER_CLIENT_SECRET', '')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-ENABLE_TABLE_BROWSER = env.bool('ENABLE_TABLE_BROWSER', default=False)
 
 if env.str("SENTRY_DSN", default='') != '':
     if not MULTIUSER_DEPLOYMENT:

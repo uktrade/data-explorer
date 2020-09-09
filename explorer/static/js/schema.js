@@ -1,25 +1,17 @@
 import List from 'list.js';
 
 
-$(function() {
-    function SearchFocus() {
-        if (!$(window.parent.document.getElementById("schema_frame")).hasClass('no-autofocus')) {
-            $(".search").focus();
-        }
-    }
-    var options = {
-        valueNames: [ 'schema-header', 'app' ],
-        handlers: { 'updated': [SearchFocus] }
-    };
-    var tableList = new List('tables', options);
+// Slight hack to support up to 100 column names in the search. List.JS expects each searchable datapoint within
+// a record to have a unique class.
+var numSupportedColumns = 100;
+var columnClasses = ['js-schema-table']
+for (var i = 0; i < numSupportedColumns; i++) {
+  columnClasses.push('js-schema-column-' + (i+1));
+}
 
-    $('#collapse_all').click(function(){
-        $('.schema-table').hide();
-    });
-    $('#expand_all').click(function(){
-        $('.schema-table').show();
-    });
-    $('.schema-header').click(function(){
-        $(this).parent().find('.schema-table').toggle();
-    });
+var tableList = new List('js-tables', {
+  indexAsync: true,
+  listClass: "js-list",
+  searchClass: "js-search",
+  valueNames: columnClasses,
 });

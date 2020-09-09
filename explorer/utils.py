@@ -1,6 +1,8 @@
 import re
 
+
 import sqlparse
+from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
@@ -84,11 +86,11 @@ def get_params_for_url(query):
 
 
 def url_get_rows(request):
-    return get_int_from_request(request, 'rows', app_settings.EXPLORER_DEFAULT_ROWS)
+    return int(request.POST.get("query-rows", app_settings.EXPLORER_DEFAULT_ROWS))
 
 
 def url_get_page(request):
-    return get_int_from_request(request, 'page', 1)
+    return int(request.POST.get("query-page", 1))
 
 
 def url_get_query_id(request):
@@ -101,6 +103,10 @@ def url_get_log_id(request):
 
 def url_get_show(request):
     return bool(get_int_from_request(request, 'show', 1))
+
+
+def url_get_save(request):
+    return bool(get_int_from_request(request, 'save', 0))
 
 
 def url_get_params(request):
@@ -123,7 +129,7 @@ def get_valid_connection(alias=None):
     from explorer.connections import connections
 
     if not alias:
-        return connections[app_settings.EXPLORER_DEFAULT_CONNECTION]
+        return connections[settings.EXPLORER_DEFAULT_CONNECTION]
 
     if alias not in connections:
         raise InvalidExplorerConnectionException(
