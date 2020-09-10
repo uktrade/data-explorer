@@ -37,7 +37,7 @@ class TestQueryListView(TestCase):
         self.assertContains(resp, '4')
 
 
-class TestQueryCreateView(TestCase):
+class TestQueryCreateView(TransactionTestCase):
     def setUp(self):
         self.admin = User.objects.create_superuser('admin', 'admin@admin.com', 'pwd')
         self.user = User.objects.create_user('user', 'user@user.com', 'pwd')
@@ -62,11 +62,13 @@ class TestQueryCreateView(TestCase):
 
     def test_invalid_query(self):
         self.client.login(username='admin', password='pwd')
-        query = SimpleQueryFactory.build(sql='DELETE FROM foo;')
+        query = SimpleQueryFactory.build(sql='SELECT foo; DELETE FROM foo;')
         data = model_to_dict(query)
+        data['action'] = "save"
         del data['id']
         del data['created_by_user']
-        self.client.post(reverse("query_create"), data)
+        response = self.client.post(reverse("query_create"), data)
+        assert response.status_code == 200
         self.assertEquals(len(Query.objects.all()), 0)
 
     def test_renders_back_link(self):
