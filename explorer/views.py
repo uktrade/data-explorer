@@ -245,6 +245,8 @@ class CreateQueryView(CreateView):
                 )
                 if vm['form'].errors:
                     self.object.delete()
+                    del vm['query']
+
                     return render(request, self.template_name, vm)
 
                 return HttpResponseRedirect(
