@@ -245,6 +245,7 @@ class CreateQueryView(CreateView):
                 )
                 if vm['form'].errors:
                     self.object.delete()
+                    return render(request, self.template_name, vm)
 
                 return HttpResponseRedirect(
                     reverse_lazy('query_detail', kwargs={'query_id': self.object.id})
