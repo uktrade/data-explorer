@@ -1,3 +1,5 @@
+## The code for this application has been merged into [Data Workspace](https://github.com/uktrade/data-workspace/) directly. This repo is no longer under development.
+
 # Data Explorer
 
 Small django application to demo django-sql-explorer
